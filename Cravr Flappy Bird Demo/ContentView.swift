@@ -16,10 +16,10 @@ struct ContentView: View {
     @State private var gameOver = false
     @State private var birdScale: CGFloat = 1.0
     
-    let gravity: CGFloat = 0.8
-    let jump: CGFloat = -14
+    let gravity: CGFloat = 0.65
+    let jump: CGFloat = -9
     let pipeWidth: CGFloat = 50
-    let pipeSpacing: CGFloat = 150
+    let pipeSpacing: CGFloat = 180
     let pipeSpeed: CGFloat = 4
     let timer = Timer.publish(every: 0.016, on: .main, in: .common).autoconnect() // ~60 FPS for smoother gameplay
     
@@ -214,7 +214,7 @@ struct ContentView: View {
         velocity = 0
         score = 0
         birdScale = 1.0
-        pipes = [Pipe(x: UIScreen.main.bounds.width + 100, topHeight: CGFloat.random(in: 100...300))]
+        pipes = [Pipe(x: UIScreen.main.bounds.width + 100, topHeight: CGFloat.random(in: 120...280))]
         gameOver = false
         print("Game reset complete. gameOver: \(gameOver)") // Debug print
     }
@@ -240,7 +240,18 @@ struct ContentView: View {
         
         // Add new pipe if needed
         if pipes.last?.x ?? 0 < UIScreen.main.bounds.width - 200 {
-            let topHeight = CGFloat.random(in: 100...300)
+            // Make first 10 pipes easier with more consistent gaps
+            let topHeight: CGFloat
+            if score < 10 {
+                // Easier range for first 10 pipes (more consistent, wider gaps)
+                topHeight = CGFloat.random(in: 120...280)
+            } else {
+                // Gradually increase difficulty after score 10
+                let difficulty = min((score - 10) / 5, 4) // Increase difficulty every 5 points, max at score 30
+                let minHeight = 100 + CGFloat(difficulty) * 20
+                let maxHeight = 300 - CGFloat(difficulty) * 20
+                topHeight = CGFloat.random(in: minHeight...maxHeight)
+            }
             pipes.append(Pipe(x: UIScreen.main.bounds.width + pipeWidth, topHeight: topHeight))
         }
         
