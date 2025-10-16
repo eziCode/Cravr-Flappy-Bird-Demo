@@ -17,9 +17,9 @@ struct StarBackground: View {
                 // Green gradient background (Cravr theme)
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        Color("0d4f0d"), // Dark green
-                        Color("1cd91f"), // SGBus Green
-                        Color("0a3a0a")  // Darker green
+                        Color(hex: "0d4f0d"), // Dark green
+                        Color(hex: "1cd91f"), // SGBus Green
+                        Color(hex: "0a3a0a")  // Darker green
                     ]),
                     startPoint: .top,
                     endPoint: .bottom
@@ -38,14 +38,15 @@ struct StarBackground: View {
                 generateStars(in: geometry.size)
             }
         }
+        .allowsHitTesting(false) // Make background non-interactive so taps pass through
     }
     
     private func generateStars(in size: CGSize) {
         let starColors = [
             Color.white,
-            Color("f7ec59"), // Maize
-            Color("fa7921"), // Pumpkin
-            Color("92dce5")  // Non Photo Blue
+            Color(hex: "f7ec59"), // Maize
+            Color(hex: "fa7921"), // Pumpkin
+            Color(hex: "92dce5")  // Non Photo Blue
         ]
         
         stars = (0..<100).map { _ in
