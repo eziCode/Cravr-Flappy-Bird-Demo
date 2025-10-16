@@ -16,8 +16,8 @@ struct ContentView: View {
     @State private var gameOver = false
     @State private var birdScale: CGFloat = 1.0
     
-    let gravity: CGFloat = 0.5
-    let jump: CGFloat = -10
+    let gravity: CGFloat = 0.8
+    let jump: CGFloat = -14
     let pipeWidth: CGFloat = 50
     let pipeSpacing: CGFloat = 150
     let pipeSpeed: CGFloat = 4
