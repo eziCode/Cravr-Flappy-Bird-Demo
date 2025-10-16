@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import UIKit
 
 struct ContentView: View {
     @State private var birdY: CGFloat = 0
@@ -20,8 +21,19 @@ struct ContentView: View {
     let jump: CGFloat = -9
     let pipeWidth: CGFloat = 50
     let pipeSpacing: CGFloat = 180
-    let pipeSpeed: CGFloat = 4
+    let basePipeSpeed: CGFloat = 4
     let timer = Timer.publish(every: 0.016, on: .main, in: .common).autoconnect() // ~60 FPS for smoother gameplay
+    
+    // Dynamic pipe speed that increases after score 10
+    var pipeSpeed: CGFloat {
+        if score <= 10 {
+            return basePipeSpeed
+        } else {
+            // Gradually increase speed by 0.1 every 5 points after score 10
+            let speedIncrease = CGFloat((score - 10) / 5) * 0.1
+            return basePipeSpeed + speedIncrease
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -191,6 +203,7 @@ struct ContentView: View {
                     }
                 }
                 
+                
                 // Add slight haptic feedback if available
                 let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                 impactFeedback.impactOccurred()
@@ -228,10 +241,17 @@ struct ContentView: View {
         for i in pipes.indices {
             pipes[i].x -= pipeSpeed
             
-            // Check for scoring
-            if pipes[i].x + pipeWidth/2 < 100 && !pipes[i].passed {
+            // Check for scoring - only when bird is completely through the pipe gap
+            if pipes[i].x + pipeWidth/2 < 100 - 15 && !pipes[i].passed {
                 score += 1
                 pipes[i].passed = true
+                
+                // Play scoring sound effect
+                playScoringSound()
+                
+                // Light haptic feedback for passing through pole
+                let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                impactFeedback.impactOccurred()
             }
         }
         
@@ -269,6 +289,18 @@ struct ContentView: View {
         if birdY + 15 > UIScreen.main.bounds.height / 2 || birdY - 15 < -UIScreen.main.bounds.height / 2 {
             print("Game over - ground/ceiling collision! birdY: \(birdY)") // Debug print
             gameOver = true
+        }
+    }
+    
+    // MARK: - Audio and Haptic Feedback
+    
+    private func playScoringSound() {
+        if score % 10 == 0 && score > 0 {
+            // Special sound for every 10 points
+            SoundManager.shared.playChime()
+        } else {
+            // Regular scoring sound
+            SoundManager.shared.playDing()
         }
     }
 }
