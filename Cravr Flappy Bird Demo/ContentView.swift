@@ -9,12 +9,18 @@ import SwiftUI
 import Combine
 import UIKit
 
+enum GameState {
+    case menu
+    case playing
+    case gameOver
+}
+
 struct ContentView: View {
     @State private var birdY: CGFloat = 0
     @State private var velocity: CGFloat = 0
     @State private var score: Int = 0
     @State private var pipes: [Pipe] = []
-    @State private var gameOver = false
+    @State private var gameState: GameState = .menu
     @State private var birdScale: CGFloat = 1.0
     
     let gravity: CGFloat = 0.55
@@ -41,156 +47,196 @@ struct ContentView: View {
             StarBackground()
                 .ignoresSafeArea()
             
-            // Bird with enhanced styling
-            ZStack {
-                // Bird shadow
-                Circle()
-                    .frame(width: 32, height: 32)
-                    .foregroundColor(.black.opacity(0.3))
-                    .offset(x: 2, y: 2)
-                
-                // Main bird body
-                Circle()
-                    .frame(width: 30, height: 30)
-                    .foregroundStyle(
-                        RadialGradient(
-                            gradient: Gradient(colors: [
-                                Color(hex: "f7ec59"), // Maize - lighter center
-                                Color(hex: "fa7921")  // Pumpkin - darker edges
-                            ]),
-                            center: .topLeading,
-                            startRadius: 5,
-                            endRadius: 20
-                        )
-                    )
-                    .overlay(
-                        // Bird eye
+            if gameState == .menu {
+                // Welcome Menu Screen
+                VStack(spacing: 40) {
+                    Spacer()
+                    
+                    // Welcome message
+                    Text("Welcome!")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(hex: "f7ec59")) // Maize
+                        .shadow(color: .black, radius: 3, x: 2, y: 2)
+                    
+                    // Bird in menu
+                    ZStack {
+                        // Bird shadow
                         Circle()
-                            .frame(width: 8, height: 8)
-                            .foregroundColor(.black)
-                            .offset(x: -5, y: -5)
-                    )
-                    .overlay(
-                        // Bird beak
-                        Triangle()
-                            .frame(width: 6, height: 4)
-                            .foregroundColor(Color(hex: "fa7921"))
-                            .offset(x: 12, y: 0)
-                    )
-            }
-            .scaleEffect(birdScale)
-            .animation(.easeOut(duration: 0.1), value: birdScale)
-            .position(x: 100, y: birdY + UIScreen.main.bounds.height / 2)
-            
-            // Enhanced Pipes
-            ForEach(pipes) { pipe in
-                VStack(spacing: 0) {
-                    // Top pipe
-                    ZStack {
-                        Rectangle()
-                            .frame(width: pipeWidth + 4, height: pipe.topHeight + 4)
+                            .frame(width: 64, height: 64)
                             .foregroundColor(.black.opacity(0.3))
-                            .offset(x: 2, y: 2)
+                            .offset(x: 4, y: 4)
                         
-                        Rectangle()
-                            .frame(width: pipeWidth, height: pipe.topHeight)
+                        // Main bird body
+                        Circle()
+                            .frame(width: 60, height: 60)
                             .foregroundStyle(
-                                LinearGradient(
+                                RadialGradient(
                                     gradient: Gradient(colors: [
-                                        Color(hex: "1cd91f"), // SGBus Green
-                                        Color(hex: "0d4f0d")  // Darker green for depth
+                                        Color(hex: "f7ec59"), // Maize - lighter center
+                                        Color(hex: "fa7921")  // Pumpkin - darker edges
                                     ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
+                                    center: .topLeading,
+                                    startRadius: 10,
+                                    endRadius: 40
                                 )
                             )
                             .overlay(
-                                Rectangle()
-                                    .frame(width: pipeWidth - 8, height: 8)
-                                    .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue accent
-                                    .offset(y: pipe.topHeight/2 - 4)
-                            )
-                    }
-                    
-                    Spacer().frame(height: pipeSpacing)
-                    
-                    // Bottom pipe
-                    ZStack {
-                        Rectangle()
-                            .frame(width: pipeWidth + 4, height: pipe.bottomHeight + 4)
-                            .foregroundColor(.black.opacity(0.3))
-                            .offset(x: 2, y: -2)
-                        
-                        Rectangle()
-                            .frame(width: pipeWidth, height: pipe.bottomHeight)
-                            .foregroundStyle(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(hex: "0d4f0d"), // Darker green for depth
-                                        Color(hex: "1cd91f")  // SGBus Green
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
+                                // Bird eye
+                                Circle()
+                                    .frame(width: 16, height: 16)
+                                    .foregroundColor(.black)
+                                    .offset(x: -10, y: -10)
                             )
                             .overlay(
-                                Rectangle()
-                                    .frame(width: pipeWidth - 8, height: 8)
-                                    .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue accent
-                                    .offset(y: -pipe.bottomHeight/2 + 4)
+                                // Bird beak
+                                Triangle()
+                                    .frame(width: 12, height: 8)
+                                    .foregroundColor(Color(hex: "fa7921"))
+                                    .offset(x: 24, y: 0)
                             )
                     }
+                    .scaleEffect(birdScale)
+                    .animation(.easeOut(duration: 0.1), value: birdScale)
+                    
+                    Text("Tap to Start Playing!")
+                        .font(.system(size: 24, weight: .medium, design: .rounded))
+                        .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
+                        .shadow(color: .black, radius: 2, x: 1, y: 1)
+                    
+                    Spacer()
                 }
-                .position(x: pipe.x, y: UIScreen.main.bounds.height / 2)
-            }
-            
-            // Enhanced Score Display
-            ZStack {
-                // Score background
-                RoundedRectangle(cornerRadius: 15)
-                    .frame(width: 200, height: 60)
-                    .foregroundColor(.black.opacity(0.6))
-                    .blur(radius: 1)
+            } else {
+                // Game Screen (playing or game over)
                 
-                Text("Score: \(score)")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(hex: "f7ec59")) // Maize
-                    .shadow(color: .black, radius: 2, x: 1, y: 1)
-            }
-            .position(x: UIScreen.main.bounds.width / 2, y: 60)
-            
-            // Enhanced Game Over Screen
-            if gameOver {
+                // Bird with enhanced styling
                 ZStack {
-                    // Game over background
-                    Rectangle()
-                        .fill(.black.opacity(0.8))
-                        .ignoresSafeArea()
+                    // Bird shadow
+                    Circle()
+                        .frame(width: 32, height: 32)
+                        .foregroundColor(.black.opacity(0.3))
+                        .offset(x: 2, y: 2)
                     
-                    VStack(spacing: 20) {
-                        Text("Game Over")
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
-                            .foregroundColor(Color(hex: "fa7921")) // Pumpkin
-                            .shadow(color: .black, radius: 3, x: 2, y: 2)
+                    // Main bird body
+                    Circle()
+                        .frame(width: 30, height: 30)
+                        .foregroundStyle(
+                            RadialGradient(
+                                gradient: Gradient(colors: [
+                                    Color(hex: "f7ec59"), // Maize - lighter center
+                                    Color(hex: "fa7921")  // Pumpkin - darker edges
+                                ]),
+                                center: .topLeading,
+                                startRadius: 5,
+                                endRadius: 20
+                            )
+                        )
+                        .overlay(
+                            // Bird eye
+                            Circle()
+                                .frame(width: 8, height: 8)
+                                .foregroundColor(.black)
+                                .offset(x: -5, y: -5)
+                        )
+                        .overlay(
+                            // Bird beak
+                            Triangle()
+                                .frame(width: 6, height: 4)
+                                .foregroundColor(Color(hex: "fa7921"))
+                                .offset(x: 12, y: 0)
+                        )
+                }
+                .scaleEffect(birdScale)
+                .animation(.easeOut(duration: 0.1), value: birdScale)
+                .position(x: 100, y: birdY + UIScreen.main.bounds.height / 2)
+                
+                // Enhanced Pipes
+                ForEach(pipes) { pipe in
+                    VStack(spacing: 0) {
+                        // Top pipe
+                        ZStack {
+                            Rectangle()
+                                .frame(width: pipeWidth + 4, height: pipe.topHeight + 4)
+                                .foregroundColor(.black.opacity(0.3))
+                                .offset(x: 2, y: 2)
+                            
+                            Rectangle()
+                                .frame(width: pipeWidth, height: pipe.topHeight)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color(hex: "1cd91f"), // SGBus Green
+                                            Color(hex: "0d4f0d")  // Darker green for depth
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .overlay(
+                                    Rectangle()
+                                        .frame(width: pipeWidth - 8, height: 8)
+                                        .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue accent
+                                        .offset(y: pipe.topHeight/2 - 4)
+                                )
+                        }
                         
-                        Text("Final Score: \(score)")
-                            .font(.system(size: 24, weight: .semibold, design: .rounded))
+                        Spacer().frame(height: pipeSpacing)
+                        
+                        // Bottom pipe
+                        ZStack {
+                            Rectangle()
+                                .frame(width: pipeWidth + 4, height: pipe.bottomHeight + 4)
+                                .foregroundColor(.black.opacity(0.3))
+                                .offset(x: 2, y: -2)
+                            
+                            Rectangle()
+                                .frame(width: pipeWidth, height: pipe.bottomHeight)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color(hex: "0d4f0d"), // Darker green for depth
+                                            Color(hex: "1cd91f")  // SGBus Green
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .overlay(
+                                    Rectangle()
+                                        .frame(width: pipeWidth - 8, height: 8)
+                                        .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue accent
+                                        .offset(y: -pipe.bottomHeight/2 + 4)
+                                )
+                        }
+                    }
+                    .position(x: pipe.x, y: UIScreen.main.bounds.height / 2)
+                }
+                
+                // Enhanced Score Display (only show when playing)
+                if gameState == .playing {
+                    ZStack {
+                        // Score background
+                        RoundedRectangle(cornerRadius: 15)
+                            .frame(width: 200, height: 60)
+                            .foregroundColor(.black.opacity(0.6))
+                            .blur(radius: 1)
+                        
+                        Text("Score: \(score)")
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: "f7ec59")) // Maize
                             .shadow(color: .black, radius: 2, x: 1, y: 1)
-                        
-                        Text("Tap to Play Again")
-                            .font(.system(size: 18, weight: .medium, design: .rounded))
-                            .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
-                            .padding(.top, 10)
                     }
+                    .position(x: UIScreen.main.bounds.width / 2, y: 60)
                 }
             }
         }
         .contentShape(Rectangle()) // Ensure the entire area is tappable
         .onTapGesture {
-            print("Tap detected! gameOver: \(gameOver)") // Debug print
-            if !gameOver {
-                // Immediate jump response - no waiting for timer
+            print("Tap detected! gameState: \(gameState)") // Debug print
+            if gameState == .menu {
+                // Start the game
+                startGame()
+            } else if gameState == .playing {
+                // Jump during gameplay
                 velocity = jump
                 
                 // Visual feedback - quick scale animation
@@ -203,33 +249,42 @@ struct ContentView: View {
                     }
                 }
                 
-                
                 // Add slight haptic feedback if available
                 let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                 impactFeedback.impactOccurred()
-            } else {
-                resetGame()
             }
+            // No action needed for gameOver state - it will automatically redirect to menu
         }
         .onReceive(timer) { _ in
-            if !gameOver {
+            if gameState == .playing {
                 updateGame()
             }
         }
         .onAppear {
-            resetGame()
+            // Game starts in menu state
         }
     }
     
-    func resetGame() {
-        print("Resetting game...") // Debug print
+    func startGame() {
+        print("Starting game...") // Debug print
+        gameState = .playing
         birdY = 0
         velocity = 0
         score = 0
         birdScale = 1.0
         pipes = [Pipe(x: UIScreen.main.bounds.width + 100, topHeight: CGFloat.random(in: 120...280))]
-        gameOver = false
-        print("Game reset complete. gameOver: \(gameOver)") // Debug print
+        print("Game started. gameState: \(gameState)") // Debug print
+    }
+    
+    func resetGame() {
+        print("Resetting to menu...") // Debug print
+        gameState = .menu
+        birdY = 0
+        velocity = 0
+        score = 0
+        birdScale = 1.0
+        pipes = []
+        print("Game reset to menu. gameState: \(gameState)") // Debug print
     }
     
     func updateGame() {
@@ -281,14 +336,17 @@ struct ContentView: View {
             let topRect = CGRect(x: pipe.x - pipeWidth/2, y: 0, width: pipeWidth, height: pipe.topHeight)
             let bottomRect = CGRect(x: pipe.x - pipeWidth/2, y: pipe.topHeight + pipeSpacing, width: pipeWidth, height: UIScreen.main.bounds.height - pipe.topHeight - pipeSpacing)
             if birdFrame.intersects(topRect) || birdFrame.intersects(bottomRect) {
-                gameOver = true
+                print("Game over - pipe collision! Redirecting to menu...") // Debug print
+                resetGame()
+                return
             }
         }
         
         // Check ground & ceiling
         if birdY + 15 > UIScreen.main.bounds.height / 2 || birdY - 15 < -UIScreen.main.bounds.height / 2 {
-            print("Game over - ground/ceiling collision! birdY: \(birdY)") // Debug print
-            gameOver = true
+            print("Game over - ground/ceiling collision! birdY: \(birdY). Redirecting to menu...") // Debug print
+            resetGame()
+            return
         }
     }
     
