@@ -16,12 +16,12 @@ enum GameState {
 }
 
 struct ContentView: View {
-    @State private var birdY: CGFloat = 0
+    @State private var slothY: CGFloat = 0
     @State private var velocity: CGFloat = 0
     @State private var score: Int = 0
     @State private var pipes: [Pipe] = []
     @State private var gameState: GameState = .menu
-    @State private var birdScale: CGFloat = 1.0
+    @State private var slothScale: CGFloat = 1.0
     @State private var hasPlayedOnce: Bool = false
     @AppStorage("highScore") private var highScore: Int = 0
 
@@ -57,51 +57,64 @@ struct ContentView: View {
                     // Title Graphic
                     VStack(spacing: 20) {
                         // Game Title
-                        Text("CRAVR FLAPPY BIRD")
+                        Text("FLAPPY SLOTH")
                             .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: "f7ec59")) // Maize
                             .shadow(color: .black, radius: 3, x: 2, y: 2)
                             .multilineTextAlignment(.center)
                         
-                        // Bird Logo
+                        // Sloth Logo
                         ZStack {
-                            // Bird shadow
+                            // Sloth shadow
                             Circle()
                                 .frame(width: 80, height: 80)
                                 .foregroundColor(.black.opacity(0.3))
                                 .offset(x: 6, y: 6)
                             
-                            // Main bird body
-                            Circle()
-                                .frame(width: 76, height: 76)
+                            // Main sloth body
+                            RoundedRectangle(cornerRadius: 38)
+                                .frame(width: 76, height: 90)
                                 .foregroundStyle(
-                                    RadialGradient(
+                                    LinearGradient(
                                         gradient: Gradient(colors: [
-                                            Color(hex: "f7ec59"), // Maize - lighter center
-                                            Color(hex: "fa7921")  // Pumpkin - darker edges
+                                            Color(hex: "8B7355"), // Brown - lighter
+                                            Color(hex: "6B5B47")  // Darker brown
                                         ]),
-                                        center: .topLeading,
-                                        startRadius: 12,
-                                        endRadius: 50
+                                        startPoint: .top,
+                                        endPoint: .bottom
                                     )
                                 )
                                 .overlay(
-                                    // Bird eye
-                                    Circle()
-                                        .frame(width: 20, height: 20)
-                                        .foregroundColor(.black)
-                                        .offset(x: -12, y: -12)
+                                    // Sloth face mask
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .frame(width: 50, height: 35)
+                                        .foregroundColor(Color(hex: "A68B5B")) // Lighter brown
+                                        .offset(y: -15)
                                 )
                                 .overlay(
-                                    // Bird beak
-                                    Triangle()
-                                        .frame(width: 16, height: 12)
-                                        .foregroundColor(Color(hex: "fa7921"))
-                                        .offset(x: 30, y: 0)
+                                    // Sloth eye
+                                    Circle()
+                                        .frame(width: 16, height: 16)
+                                        .foregroundColor(.black)
+                                        .offset(x: -8, y: -20)
+                                )
+                                .overlay(
+                                    // Sloth nose
+                                    Circle()
+                                        .frame(width: 8, height: 6)
+                                        .foregroundColor(Color(hex: "4A3A2A"))
+                                        .offset(x: 5, y: -8)
+                                )
+                                .overlay(
+                                    // Sloth mouth
+                                    Capsule()
+                                        .frame(width: 12, height: 3)
+                                        .foregroundColor(Color(hex: "4A3A2A"))
+                                        .offset(x: 2, y: 5)
                                 )
                         }
-                        .scaleEffect(birdScale)
-                        .animation(.easeOut(duration: 0.1), value: birdScale)
+                        .scaleEffect(slothScale)
+                        .animation(.easeOut(duration: 0.1), value: slothScale)
                     }
                     
                     // High Score Display
@@ -146,7 +159,7 @@ struct ContentView: View {
                             }
                         }
                         .scaleEffect(1.0)
-                        .animation(.easeOut(duration: 0.1), value: birdScale)
+                        .animation(.easeOut(duration: 0.1), value: slothScale)
                         
                         // Back Button (TODO)
                         Button(action: {
@@ -172,46 +185,59 @@ struct ContentView: View {
             } else {
                 // Game Screen (playing or game over)
                 
-                // Bird with enhanced styling
+                // Sloth with enhanced styling
                 ZStack {
-                    // Bird shadow
+                    // Sloth shadow
                     Circle()
                         .frame(width: 32, height: 32)
                         .foregroundColor(.black.opacity(0.3))
                         .offset(x: 2, y: 2)
                     
-                    // Main bird body
-                    Circle()
-                        .frame(width: 30, height: 30)
+                    // Main sloth body
+                    RoundedRectangle(cornerRadius: 15)
+                        .frame(width: 30, height: 36)
                         .foregroundStyle(
-                            RadialGradient(
+                            LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color(hex: "f7ec59"), // Maize - lighter center
-                                    Color(hex: "fa7921")  // Pumpkin - darker edges
+                                    Color(hex: "8B7355"), // Brown - lighter
+                                    Color(hex: "6B5B47")  // Darker brown
                                 ]),
-                                center: .topLeading,
-                                startRadius: 5,
-                                endRadius: 20
+                                startPoint: .top,
+                                endPoint: .bottom
                             )
                         )
                         .overlay(
-                            // Bird eye
-                            Circle()
-                                .frame(width: 8, height: 8)
-                                .foregroundColor(.black)
-                                .offset(x: -5, y: -5)
+                            // Sloth face mask
+                            RoundedRectangle(cornerRadius: 8)
+                                .frame(width: 20, height: 14)
+                                .foregroundColor(Color(hex: "A68B5B")) // Lighter brown
+                                .offset(y: -8)
                         )
                         .overlay(
-                            // Bird beak
-                            Triangle()
-                                .frame(width: 6, height: 4)
-                                .foregroundColor(Color(hex: "fa7921"))
-                                .offset(x: 12, y: 0)
+                            // Sloth eye
+                            Circle()
+                                .frame(width: 6, height: 6)
+                                .foregroundColor(.black)
+                                .offset(x: -3, y: -8)
+                        )
+                        .overlay(
+                            // Sloth nose
+                            Circle()
+                                .frame(width: 3, height: 2)
+                                .foregroundColor(Color(hex: "4A3A2A"))
+                                .offset(x: 2, y: -3)
+                        )
+                        .overlay(
+                            // Sloth mouth
+                            Capsule()
+                                .frame(width: 5, height: 1)
+                                .foregroundColor(Color(hex: "4A3A2A"))
+                                .offset(x: 1, y: 2)
                         )
                 }
-                .scaleEffect(birdScale)
-                .animation(.easeOut(duration: 0.1), value: birdScale)
-                .position(x: 100, y: birdY + UIScreen.main.bounds.height / 2)
+                .scaleEffect(slothScale)
+                .animation(.easeOut(duration: 0.1), value: slothScale)
+                .position(x: 100, y: slothY + UIScreen.main.bounds.height / 2)
                 
                 // Enhanced Pipes
                 ForEach(pipes) { pipe in
@@ -298,16 +324,16 @@ struct ContentView: View {
         .onTapGesture {
             print("Tap detected! gameState: \(gameState)") // Debug print
             if gameState == .playing {
-                // Jump during gameplay
+                // Swing during gameplay
                 velocity = jump
                 
                 // Visual feedback - quick scale animation
                 withAnimation(.easeOut(duration: 0.1)) {
-                    birdScale = 1.2
+                    slothScale = 1.2
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     withAnimation(.easeOut(duration: 0.1)) {
-                        birdScale = 1.0
+                        slothScale = 1.0
                     }
                 }
                 
@@ -329,10 +355,10 @@ struct ContentView: View {
     func startGame() {
         print("Starting game...") // Debug print
         gameState = .playing
-        birdY = 0
+        slothY = 0
         velocity = 0
         score = 0
-        birdScale = 1.0
+        slothScale = 1.0
         pipes = [Pipe(x: UIScreen.main.bounds.width + 100, topHeight: CGFloat.random(in: 120...280))]
         hasPlayedOnce = true
         print("Game started. gameState: \(gameState)") // Debug print
@@ -348,25 +374,25 @@ struct ContentView: View {
         }
         
         gameState = .menu
-        birdY = 0
+        slothY = 0
         velocity = 0
         score = 0
-        birdScale = 1.0
+        slothScale = 1.0
         pipes = []
         // Don't reset hasPlayedOnce - we want to remember they've played before
         print("Game reset to menu. gameState: \(gameState), highScore: \(highScore)") // Debug print
     }
     
     func updateGame() {
-        // Bird physics
+        // Sloth physics
         velocity += gravity
-        birdY += velocity
+        slothY += velocity
         
         // Pipe movement
         for i in pipes.indices {
             pipes[i].x -= pipeSpeed
             
-            // Check for scoring - only when bird is completely through the pipe gap
+            // Check for scoring - only when sloth is completely through the pipe gap
             if pipes[i].x + pipeWidth/2 < 100 - 15 && !pipes[i].passed {
                 score += 1
                 pipes[i].passed = true
@@ -402,10 +428,10 @@ struct ContentView: View {
         
         // Check collisions
         for pipe in pipes {
-            let birdFrame = CGRect(x: 100 - 15, y: birdY + UIScreen.main.bounds.height / 2 - 15, width: 30, height: 30)
+            let slothFrame = CGRect(x: 100 - 15, y: slothY + UIScreen.main.bounds.height / 2 - 15, width: 30, height: 30)
             let topRect = CGRect(x: pipe.x - pipeWidth/2, y: 0, width: pipeWidth, height: pipe.topHeight)
             let bottomRect = CGRect(x: pipe.x - pipeWidth/2, y: pipe.topHeight + pipeSpacing, width: pipeWidth, height: UIScreen.main.bounds.height - pipe.topHeight - pipeSpacing)
-            if birdFrame.intersects(topRect) || birdFrame.intersects(bottomRect) {
+            if slothFrame.intersects(topRect) || slothFrame.intersects(bottomRect) {
                 print("Game over - pipe collision! Redirecting to menu...") // Debug print
                 resetGame()
                 return
@@ -413,8 +439,8 @@ struct ContentView: View {
         }
         
         // Check ground & ceiling
-        if birdY + 15 > UIScreen.main.bounds.height / 2 || birdY - 15 < -UIScreen.main.bounds.height / 2 {
-            print("Game over - ground/ceiling collision! birdY: \(birdY). Redirecting to menu...") // Debug print
+        if slothY + 15 > UIScreen.main.bounds.height / 2 || slothY - 15 < -UIScreen.main.bounds.height / 2 {
+            print("Game over - ground/ceiling collision! slothY: \(slothY). Redirecting to menu...") // Debug print
             resetGame()
             return
         }
@@ -488,3 +514,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
