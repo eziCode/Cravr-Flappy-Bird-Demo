@@ -24,6 +24,7 @@ struct ContentView: View {
     @State private var birdScale: CGFloat = 1.0
     @State private var hasPlayedOnce: Bool = false
     @State private var justLost: Bool = false
+    @AppStorage("highScore") private var highScore: Int = 0
     
     let gravity: CGFloat = 0.55
     let jump: CGFloat = -9
@@ -50,60 +51,122 @@ struct ContentView: View {
                 .ignoresSafeArea()
             
             if gameState == .menu {
-                // Welcome Menu Screen
-                VStack(spacing: 40) {
+                // Main Menu Screen
+                VStack(spacing: 30) {
                     Spacer()
                     
-                    // Welcome message
-                    Text("Welcome!")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundColor(Color(hex: "f7ec59")) // Maize
-                        .shadow(color: .black, radius: 3, x: 2, y: 2)
-                    
-                    // Bird in menu
-                    ZStack {
-                        // Bird shadow
-                        Circle()
-                            .frame(width: 64, height: 64)
-                            .foregroundColor(.black.opacity(0.3))
-                            .offset(x: 4, y: 4)
+                    // Title Graphic
+                    VStack(spacing: 20) {
+                        // Game Title
+                        Text("CRAVR FLAPPY BIRD")
+                            .font(.system(size: 36, weight: .bold, design: .rounded))
+                            .foregroundColor(Color(hex: "f7ec59")) // Maize
+                            .shadow(color: .black, radius: 3, x: 2, y: 2)
+                            .multilineTextAlignment(.center)
                         
-                        // Main bird body
-                        Circle()
-                            .frame(width: 60, height: 60)
-                            .foregroundStyle(
-                                RadialGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(hex: "f7ec59"), // Maize - lighter center
-                                        Color(hex: "fa7921")  // Pumpkin - darker edges
-                                    ]),
-                                    center: .topLeading,
-                                    startRadius: 10,
-                                    endRadius: 40
+                        // Bird Logo
+                        ZStack {
+                            // Bird shadow
+                            Circle()
+                                .frame(width: 80, height: 80)
+                                .foregroundColor(.black.opacity(0.3))
+                                .offset(x: 6, y: 6)
+                            
+                            // Main bird body
+                            Circle()
+                                .frame(width: 76, height: 76)
+                                .foregroundStyle(
+                                    RadialGradient(
+                                        gradient: Gradient(colors: [
+                                            Color(hex: "f7ec59"), // Maize - lighter center
+                                            Color(hex: "fa7921")  // Pumpkin - darker edges
+                                        ]),
+                                        center: .topLeading,
+                                        startRadius: 12,
+                                        endRadius: 50
+                                    )
                                 )
-                            )
-                            .overlay(
-                                // Bird eye
-                                Circle()
-                                    .frame(width: 16, height: 16)
-                                    .foregroundColor(.black)
-                                    .offset(x: -10, y: -10)
-                            )
-                            .overlay(
-                                // Bird beak
-                                Triangle()
-                                    .frame(width: 12, height: 8)
-                                    .foregroundColor(Color(hex: "fa7921"))
-                                    .offset(x: 24, y: 0)
-                            )
+                                .overlay(
+                                    // Bird eye
+                                    Circle()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundColor(.black)
+                                        .offset(x: -12, y: -12)
+                                )
+                                .overlay(
+                                    // Bird beak
+                                    Triangle()
+                                        .frame(width: 16, height: 12)
+                                        .foregroundColor(Color(hex: "fa7921"))
+                                        .offset(x: 30, y: 0)
+                                )
+                        }
+                        .scaleEffect(birdScale)
+                        .animation(.easeOut(duration: 0.1), value: birdScale)
                     }
-                    .scaleEffect(birdScale)
-                    .animation(.easeOut(duration: 0.1), value: birdScale)
                     
-                    Text("Tap to Start Playing!")
-                        .font(.system(size: 24, weight: .medium, design: .rounded))
-                        .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
-                        .shadow(color: .black, radius: 2, x: 1, y: 1)
+                    // High Score Display
+                    VStack(spacing: 10) {
+                        Text("HIGH SCORE")
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
+                            .shadow(color: .black, radius: 2, x: 1, y: 1)
+                        
+                        ZStack {
+                            // Score background
+                            RoundedRectangle(cornerRadius: 12)
+                                .frame(width: 120, height: 50)
+                                .foregroundColor(.black.opacity(0.6))
+                                .blur(radius: 1)
+                            
+                            Text("\(highScore)")
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .foregroundColor(Color(hex: "f7ec59")) // Maize
+                                .shadow(color: .black, radius: 2, x: 1, y: 1)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // Menu Buttons
+                    VStack(spacing: 20) {
+                        // Play Button
+                        Button(action: {
+                            startGame()
+                        }) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 15)
+                                    .frame(width: 200, height: 60)
+                                    .foregroundColor(Color(hex: "1cd91f")) // SGBus Green
+                                    .shadow(color: .black.opacity(0.3), radius: 3, x: 2, y: 2)
+                                
+                                Text("PLAY")
+                                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black, radius: 2, x: 1, y: 1)
+                            }
+                        }
+                        .scaleEffect(1.0)
+                        .animation(.easeOut(duration: 0.1), value: birdScale)
+                        
+                        // Back Button (TODO)
+                        Button(action: {
+                            // TODO: Implement back button functionality to dismiss to rest of app
+                            print("Back button tapped - TODO: implement dismiss functionality")
+                        }) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .frame(width: 160, height: 50)
+                                    .foregroundColor(Color(hex: "fa7921")) // Pumpkin
+                                    .shadow(color: .black.opacity(0.3), radius: 2, x: 1, y: 1)
+                                
+                                Text("BACK")
+                                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+                            }
+                        }
+                    }
                     
                     Spacer()
                 }
@@ -256,10 +319,7 @@ struct ContentView: View {
         .contentShape(Rectangle()) // Ensure the entire area is tappable
         .onTapGesture {
             print("Tap detected! gameState: \(gameState)") // Debug print
-            if gameState == .menu {
-                // Start the game
-                startGame()
-            } else if gameState == .playing {
+            if gameState == .playing {
                 // Check if we're in the play again overlay
                 if justLost {
                     // Start the game (remove the overlay)
@@ -309,13 +369,19 @@ struct ContentView: View {
     
     func resetGameForPlayAgain() {
         print("Resetting game for play again...") // Debug print
+        
+        // Update high score if current score is higher
+        if score > highScore {
+            highScore = score
+        }
+        
         justLost = true
         birdY = 0
         velocity = 0
         score = 0
         birdScale = 1.0
         pipes = [Pipe(x: UIScreen.main.bounds.width + 100, topHeight: CGFloat.random(in: 120...280))]
-        print("Game reset for play again. justLost: \(justLost)") // Debug print
+        print("Game reset for play again. justLost: \(justLost), highScore: \(highScore)") // Debug print
     }
     
     func startGameplay() {
