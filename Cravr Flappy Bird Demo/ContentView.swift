@@ -64,55 +64,7 @@ struct ContentView: View {
                             .multilineTextAlignment(.center)
                         
                         // Sloth Logo
-                        ZStack {
-                            // Sloth shadow
-                            Circle()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(.black.opacity(0.3))
-                                .offset(x: 6, y: 6)
-                            
-                            // Main sloth body
-                            RoundedRectangle(cornerRadius: 38)
-                                .frame(width: 76, height: 90)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color(hex: "8B7355"), // Brown - lighter
-                                            Color(hex: "6B5B47")  // Darker brown
-                                        ]),
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                )
-                                .overlay(
-                                    // Sloth face mask
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .frame(width: 50, height: 35)
-                                        .foregroundColor(Color(hex: "A68B5B")) // Lighter brown
-                                        .offset(y: -15)
-                                )
-                                .overlay(
-                                    // Sloth eye
-                                    Circle()
-                                        .frame(width: 16, height: 16)
-                                        .foregroundColor(.black)
-                                        .offset(x: -8, y: -20)
-                                )
-                                .overlay(
-                                    // Sloth nose
-                                    Circle()
-                                        .frame(width: 8, height: 6)
-                                        .foregroundColor(Color(hex: "4A3A2A"))
-                                        .offset(x: 5, y: -8)
-                                )
-                                .overlay(
-                                    // Sloth mouth
-                                    Capsule()
-                                        .frame(width: 12, height: 3)
-                                        .foregroundColor(Color(hex: "4A3A2A"))
-                                        .offset(x: 2, y: 5)
-                                )
-                        }
+                        SlothIcon(size: 100)
                         .scaleEffect(slothScale)
                         .animation(.easeOut(duration: 0.1), value: slothScale)
                     }
@@ -186,55 +138,7 @@ struct ContentView: View {
                 // Game Screen (playing or game over)
                 
                 // Sloth with enhanced styling
-                ZStack {
-                    // Sloth shadow
-                    Circle()
-                        .frame(width: 32, height: 32)
-                        .foregroundColor(.black.opacity(0.3))
-                        .offset(x: 2, y: 2)
-                    
-                    // Main sloth body
-                    RoundedRectangle(cornerRadius: 15)
-                        .frame(width: 30, height: 36)
-                        .foregroundStyle(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(hex: "8B7355"), // Brown - lighter
-                                    Color(hex: "6B5B47")  // Darker brown
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .overlay(
-                            // Sloth face mask
-                            RoundedRectangle(cornerRadius: 8)
-                                .frame(width: 20, height: 14)
-                                .foregroundColor(Color(hex: "A68B5B")) // Lighter brown
-                                .offset(y: -8)
-                        )
-                        .overlay(
-                            // Sloth eye
-                            Circle()
-                                .frame(width: 6, height: 6)
-                                .foregroundColor(.black)
-                                .offset(x: -3, y: -8)
-                        )
-                        .overlay(
-                            // Sloth nose
-                            Circle()
-                                .frame(width: 3, height: 2)
-                                .foregroundColor(Color(hex: "4A3A2A"))
-                                .offset(x: 2, y: -3)
-                        )
-                        .overlay(
-                            // Sloth mouth
-                            Capsule()
-                                .frame(width: 5, height: 1)
-                                .foregroundColor(Color(hex: "4A3A2A"))
-                                .offset(x: 1, y: 2)
-                        )
-                }
+                SlothIcon(size: 40)
                 .scaleEffect(slothScale)
                 .animation(.easeOut(duration: 0.1), value: slothScale)
                 .position(x: 100, y: slothY + UIScreen.main.bounds.height / 2)
@@ -495,6 +399,82 @@ extension Color {
             blue:  Double(b) / 255,
             opacity: Double(a) / 255
         )
+    }
+}
+
+// MARK: - Sloth Icon View
+
+struct SlothIcon: View {
+    var size: CGFloat = 80
+    var body: some View {
+        let faceColor = Color(hex: "8B7355")
+        let maskColor = Color(hex: "CBB38A")
+        let patchColor = Color(hex: "5A4632")
+        let noseColor = Color(hex: "3C2C1E")
+
+        ZStack {
+            // Shadow
+            Circle()
+                .fill(Color.black.opacity(0.25))
+                .frame(width: size * 1.02, height: size * 1.02)
+                .offset(x: size * 0.07, y: size * 0.07)
+
+            // Head
+            Circle()
+                .fill(faceColor)
+                .frame(width: size, height: size)
+
+            // Face mask (lighter oval area)
+            Ellipse()
+                .fill(maskColor)
+                .frame(width: size * 0.8, height: size * 0.6)
+                .offset(y: -size * 0.05)
+
+            // Eye patches
+            Group {
+                Ellipse()
+                    .fill(patchColor)
+                    .frame(width: size * 0.25, height: size * 0.18)
+                    .offset(x: -size * 0.22, y: -size * 0.12)
+                Ellipse()
+                    .fill(patchColor)
+                    .frame(width: size * 0.25, height: size * 0.18)
+                    .offset(x: size * 0.22, y: -size * 0.12)
+            }
+
+            // Eyes
+            Group {
+                Circle()
+                    .fill(Color.black)
+                    .frame(width: size * 0.08, height: size * 0.08)
+                    .offset(x: -size * 0.22, y: -size * 0.12)
+                Circle()
+                    .fill(Color.black)
+                    .frame(width: size * 0.08, height: size * 0.08)
+                    .offset(x: size * 0.22, y: -size * 0.12)
+            }
+
+            // Nose
+            Ellipse()
+                .fill(noseColor)
+                .frame(width: size * 0.14, height: size * 0.1)
+                .offset(y: size * 0.05)
+
+            // Mouth (gentle smile)
+            Path { path in
+                let mouthWidth = size * 0.25
+                let mouthHeight = size * 0.08
+                path.addArc(
+                    center: CGPoint(x: 0, y: size * 0.08),
+                    radius: mouthWidth / 2,
+                    startAngle: .degrees(20),
+                    endAngle: .degrees(160),
+                    clockwise: false
+                )
+            }
+            .stroke(noseColor, lineWidth: size * 0.02)
+            .offset(y: size * 0.04)
+        }
     }
 }
 
