@@ -23,9 +23,8 @@ struct ContentView: View {
     @State private var gameState: GameState = .menu
     @State private var birdScale: CGFloat = 1.0
     @State private var hasPlayedOnce: Bool = false
-    @State private var justLost: Bool = false
     @AppStorage("highScore") private var highScore: Int = 0
-    
+
     let gravity: CGFloat = 0.55
     let jump: CGFloat = -9
     let pipeWidth: CGFloat = 50
@@ -293,60 +292,32 @@ struct ContentView: View {
                     .position(x: UIScreen.main.bounds.width / 2, y: 60)
                 }
             
-                // Play Again Overlay (shows when user has just lost and we're showing the game screen)
-                if gameState == .playing && justLost {
-                    ZStack {
-                        // Semi-transparent background
-                        Rectangle()
-                            .fill(.black.opacity(0.6))
-                            .ignoresSafeArea()
-                        
-                        VStack(spacing: 20) {
-                            Text("Play Again")
-                                .font(.system(size: 36, weight: .bold, design: .rounded))
-                                .foregroundColor(Color(hex: "f7ec59")) // Maize
-                                .shadow(color: .black, radius: 3, x: 2, y: 2)
-                            
-                            Text("Tap to Start!")
-                                .font(.system(size: 18, weight: .medium, design: .rounded))
-                                .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
-                                .shadow(color: .black, radius: 2, x: 1, y: 1)
-                        }
-                    }
-                }
             }
         }
         .contentShape(Rectangle()) // Ensure the entire area is tappable
         .onTapGesture {
             print("Tap detected! gameState: \(gameState)") // Debug print
             if gameState == .playing {
-                // Check if we're in the play again overlay
-                if justLost {
-                    // Start the game (remove the overlay)
-                    startGameplay()
-                } else {
-                    // Jump during gameplay
-                    velocity = jump
-                    
-                    // Visual feedback - quick scale animation
-                    withAnimation(.easeOut(duration: 0.1)) {
-                        birdScale = 1.2
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        withAnimation(.easeOut(duration: 0.1)) {
-                            birdScale = 1.0
-                        }
-                    }
-                    
-                    // Add slight haptic feedback if available
-                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                    impactFeedback.impactOccurred()
+                // Jump during gameplay
+                velocity = jump
+                
+                // Visual feedback - quick scale animation
+                withAnimation(.easeOut(duration: 0.1)) {
+                    birdScale = 1.2
                 }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation(.easeOut(duration: 0.1)) {
+                        birdScale = 1.0
+                    }
+                }
+                
+                // Add slight haptic feedback if available
+                let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                impactFeedback.impactOccurred()
             }
-            // No action needed for gameOver state - it will automatically redirect to menu
         }
         .onReceive(timer) { _ in
-            if gameState == .playing && !justLost {
+            if gameState == .playing {
                 updateGame()
             }
         }
@@ -367,42 +338,23 @@ struct ContentView: View {
         print("Game started. gameState: \(gameState)") // Debug print
     }
     
-    func resetGameForPlayAgain() {
-        print("Resetting game for play again...") // Debug print
+    
+    func resetGame() {
+        print("Resetting to menu...") // Debug print
         
         // Update high score if current score is higher
         if score > highScore {
             highScore = score
         }
         
-        justLost = true
-        birdY = 0
-        velocity = 0
-        score = 0
-        birdScale = 1.0
-        pipes = [Pipe(x: UIScreen.main.bounds.width + 100, topHeight: CGFloat.random(in: 120...280))]
-        print("Game reset for play again. justLost: \(justLost), highScore: \(highScore)") // Debug print
-    }
-    
-    func startGameplay() {
-        print("Starting gameplay (removing overlay)...") // Debug print
-        // This function is called when user taps during play again overlay
-        justLost = false
-        // The game is already in playing state, just need to start the timer
-        // No additional setup needed since the game is already initialized
-    }
-    
-    func resetGame() {
-        print("Resetting to menu...") // Debug print
         gameState = .menu
         birdY = 0
         velocity = 0
         score = 0
         birdScale = 1.0
         pipes = []
-        justLost = false
         // Don't reset hasPlayedOnce - we want to remember they've played before
-        print("Game reset to menu. gameState: \(gameState)") // Debug print
+        print("Game reset to menu. gameState: \(gameState), highScore: \(highScore)") // Debug print
     }
     
     func updateGame() {
@@ -454,16 +406,16 @@ struct ContentView: View {
             let topRect = CGRect(x: pipe.x - pipeWidth/2, y: 0, width: pipeWidth, height: pipe.topHeight)
             let bottomRect = CGRect(x: pipe.x - pipeWidth/2, y: pipe.topHeight + pipeSpacing, width: pipeWidth, height: UIScreen.main.bounds.height - pipe.topHeight - pipeSpacing)
             if birdFrame.intersects(topRect) || birdFrame.intersects(bottomRect) {
-                print("Game over - pipe collision! Showing play again screen...") // Debug print
-                resetGameForPlayAgain()
+                print("Game over - pipe collision! Redirecting to menu...") // Debug print
+                resetGame()
                 return
             }
         }
         
         // Check ground & ceiling
         if birdY + 15 > UIScreen.main.bounds.height / 2 || birdY - 15 < -UIScreen.main.bounds.height / 2 {
-            print("Game over - ground/ceiling collision! birdY: \(birdY). Showing play again screen...") // Debug print
-            resetGameForPlayAgain()
+            print("Game over - ground/ceiling collision! birdY: \(birdY). Redirecting to menu...") // Debug print
+            resetGame()
             return
         }
     }
