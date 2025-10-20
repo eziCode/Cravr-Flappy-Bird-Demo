@@ -99,18 +99,6 @@ struct PipeView: View {
                     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight)
                     .overlay(TreePipeDetails(), alignment: .center)
                     .overlay(LeavesOnPipe(isBottom: true), alignment: .center)
-                    .overlay(
-                        PipeTopCap()
-                            .frame(height: 20)
-                            .offset(y: -10)
-                        , alignment: .top
-                    )
-                    .overlay(
-                        PipeTopCap()
-                            .frame(height: 20)
-                            .offset(y: 10)
-                        , alignment: .bottom
-                    )
                     .shadow(color: .black.opacity(0.3), radius: 4, x: 2, y: -2)
             }
         }

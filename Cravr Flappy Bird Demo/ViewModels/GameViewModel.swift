@@ -161,9 +161,9 @@ class GameViewModel: ObservableObject {
                 height: GameConstants.screenHeight - pipe.topHeight - GameConstants.pipeSpacing
             )
 
-            // Build precise CGPaths for the top and bottom pipe (rounded rect + cap ellipse)
+            // Build precise CGPaths for the top and bottom pipe (rounded rect + cap ellipse for top only)
             let topPath = makePipeCGPath(forRect: topRect, capPosition: .top)
-            let bottomPath = makePipeCGPath(forRect: bottomRect, capPosition: .bottom)
+            let bottomPath = makePipeCGPath(forRect: bottomRect, capPosition: .none)
 
             // Quick bounding-box reject
             let slothBox = sloth.frame
@@ -235,6 +235,7 @@ class GameViewModel: ObservableObject {
     private enum CapPosition {
         case top
         case bottom
+        case none
     }
 
     /// Create a CGPath consisting of a rounded rect (corner radius = width / 4, same as TreePipeShape)
@@ -256,13 +257,17 @@ class GameViewModel: ObservableObject {
             // The PipeTopCap() in the pipe view was .frame(height: 20) and offset(y: -10) for top.
             // So the ellipse center sits above the topRect by capH/2 (offset -capH/2).
             capRect = CGRect(x: rect.minX, y: rect.minY - capH, width: rect.width, height: capH)
+            let capPath = UIBezierPath(ovalIn: capRect)
+            path.addPath(capPath.cgPath)
         case .bottom:
             // For bottom cap overlay offset there was .offset(y: 10) (so bubble sits below the bottom rect)
             capRect = CGRect(x: rect.minX, y: rect.maxY, width: rect.width, height: capH)
+            let capPath = UIBezierPath(ovalIn: capRect)
+            path.addPath(capPath.cgPath)
+        case .none:
+            // No cap - just the rounded rectangle
+            break
         }
-
-        let capPath = UIBezierPath(ovalIn: capRect)
-        path.addPath(capPath.cgPath)
 
         return path
     }
