@@ -13,6 +13,7 @@ struct GameConstants {
     static let jump: CGFloat = -9
     static let pipeWidth: CGFloat = 50
     static let pipeSpacing: CGFloat = 180
+    static let pipeCapHeight: CGFloat = 20.0   // matches PipeTopCap().frame(height: 20)
     static let basePipeSpeed: CGFloat = 4
     static let gameTimerInterval: Double = 0.016 // ~60 FPS
     

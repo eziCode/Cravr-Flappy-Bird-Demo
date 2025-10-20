@@ -65,7 +65,7 @@ struct PipeView: View {
                     )
                     .frame(width: GameConstants.pipeWidth, height: pipe.topHeight)
                     .overlay(TreePipeDetails(), alignment: .center)
-                    .overlay(LeavesOnPipe(), alignment: .center)
+                    .overlay(LeavesOnPipe(isBottom: false), alignment: .center)
                     .overlay(
                         PipeTopCap()
                             .frame(height: 20)
@@ -98,7 +98,7 @@ struct PipeView: View {
                     )
                     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight)
                     .overlay(TreePipeDetails(), alignment: .center)
-                    .overlay(LeavesOnPipe(), alignment: .center)
+                    .overlay(LeavesOnPipe(isBottom: true), alignment: .center)
                     .overlay(
                         PipeTopCap()
                             .frame(height: 20)
@@ -197,6 +197,8 @@ struct PipeTopCap: View {
 }
 
 struct LeavesOnPipe: View {
+    let isBottom: Bool
+    
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width
@@ -213,7 +215,7 @@ struct LeavesOnPipe: View {
                     )
                     .frame(width: w * 0.2, height: w * 0.1)
                     .rotationEffect(.degrees(-20))
-                    .offset(x: -w * 0.55, y: h * 0.3)
+                    .offset(x: -w * 0.55, y: isBottom ? h - h * 0.3 : h * 0.3)
                 
                 Leaf()
                     .fill(
@@ -225,7 +227,7 @@ struct LeavesOnPipe: View {
                     )
                     .frame(width: w * 0.2, height: w * 0.1)
                     .rotationEffect(.degrees(20))
-                    .offset(x: w * 0.55, y: h * 0.6)
+                    .offset(x: w * 0.55, y: isBottom ? h - h * 0.6 : h * 0.6)
             }
         }
     }

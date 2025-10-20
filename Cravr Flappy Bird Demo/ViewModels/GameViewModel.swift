@@ -143,21 +143,50 @@ class GameViewModel: ObservableObject {
     }
     
     private func checkCollisions() -> Bool {
+        // Sample density (more samples => more accurate; 9x9 = 81 checks)
+        let sampleGrid = 9
+
         for pipe in pipes {
+            // Body rects (same as before)
             let topRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth/2,
+                x: pipe.x - GameConstants.pipeWidth / 2,
                 y: 0,
                 width: GameConstants.pipeWidth,
                 height: pipe.topHeight
             )
             let bottomRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth/2,
+                x: pipe.x - GameConstants.pipeWidth / 2,
                 y: pipe.topHeight + GameConstants.pipeSpacing,
                 width: GameConstants.pipeWidth,
                 height: GameConstants.screenHeight - pipe.topHeight - GameConstants.pipeSpacing
             )
-            
-            if sloth.frame.intersects(topRect) || sloth.frame.intersects(bottomRect) {
+
+            // Build precise CGPaths for the top and bottom pipe (rounded rect + cap ellipse)
+            let topPath = makePipeCGPath(forRect: topRect, capPosition: .top)
+            let bottomPath = makePipeCGPath(forRect: bottomRect, capPosition: .bottom)
+
+            // Quick bounding-box reject
+            let slothBox = sloth.frame
+
+            if !slothBox.intersects(topPath.boundingBox) && !slothBox.intersects(bottomPath.boundingBox) {
+                // no possible intersection for this pipe, continue
+                continue
+            }
+
+            // Sample points in sloth rect (dense grid) and test for containment in either path.
+            if rectIntersectsPath(rect: slothBox, path: topPath, samplesPerSide: sampleGrid) {
+                return true
+            }
+            if rectIntersectsPath(rect: slothBox, path: bottomPath, samplesPerSide: sampleGrid) {
+                return true
+            }
+
+            // Additional: also test if any point from the pipe path's bounding box overlaps sloth rect (to catch thin overlap cases).
+            // Sample some points along the path bounding box as well.
+            if rectIntersectsPath(rect: topPath.boundingBox, path: makeRectCGPath(from: slothBox), samplesPerSide: sampleGrid) {
+                return true
+            }
+            if rectIntersectsPath(rect: bottomPath.boundingBox, path: makeRectCGPath(from: slothBox), samplesPerSide: sampleGrid) {
                 return true
             }
         }
@@ -201,6 +230,97 @@ class GameViewModel: ObservableObject {
         UserDefaults.standard.set(highScore, forKey: "highScore")
     }
     
+    // MARK: - Precise collision helpers
+
+    private enum CapPosition {
+        case top
+        case bottom
+    }
+
+    /// Create a CGPath consisting of a rounded rect (corner radius = width / 4, same as TreePipeShape)
+    /// plus the ellipse cap positioned at the top or bottom. Coordinates are in the same coordinate system
+    /// as your on-screen layout (same as pipe.x / heights).
+    private func makePipeCGPath(forRect rect: CGRect, capPosition: CapPosition) -> CGPath {
+        let path = CGMutablePath()
+
+        // Rounded rect (cornerRadius same as TreePipeShape)
+        let cornerRadius = rect.width / 4.0
+        let roundedRectPath = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
+        path.addPath(roundedRectPath.cgPath)
+
+        // Cap ellipse: width == rect.width, height == GameConstants.pipeCapHeight
+        let capH = GameConstants.pipeCapHeight
+        let capRect: CGRect
+        switch capPosition {
+        case .top:
+            // The PipeTopCap() in the pipe view was .frame(height: 20) and offset(y: -10) for top.
+            // So the ellipse center sits above the topRect by capH/2 (offset -capH/2).
+            capRect = CGRect(x: rect.minX, y: rect.minY - capH, width: rect.width, height: capH)
+        case .bottom:
+            // For bottom cap overlay offset there was .offset(y: 10) (so bubble sits below the bottom rect)
+            capRect = CGRect(x: rect.minX, y: rect.maxY, width: rect.width, height: capH)
+        }
+
+        let capPath = UIBezierPath(ovalIn: capRect)
+        path.addPath(capPath.cgPath)
+
+        return path
+    }
+
+    /// Build a rectangle CGPath (useful if you want to test path vs rect)
+    private func makeRectCGPath(from rect: CGRect) -> CGPath {
+        let p = CGMutablePath()
+        p.addRect(rect)
+        return p
+    }
+
+    /// Return true if any sample point inside `rect` is contained in `path`.
+    /// We sample a grid across the rect to catch intersections even if edges just graze.
+    private func rectIntersectsPath(rect: CGRect, path: CGPath, samplesPerSide: Int) -> Bool {
+        if samplesPerSide <= 0 { return false }
+
+        // Quick reject using bounding boxes
+        if !rect.intersects(path.boundingBox) {
+            return false
+        }
+
+        // Sample a grid of points inside rect (inclusive of edges)
+        for row in 0..<samplesPerSide {
+            for col in 0..<samplesPerSide {
+                let fx = CGFloat(col) / CGFloat(max(1, samplesPerSide - 1)) // 0..1
+                let fy = CGFloat(row) / CGFloat(max(1, samplesPerSide - 1)) // 0..1
+                let px = rect.minX + fx * rect.width
+                let py = rect.minY + fy * rect.height
+                if path.contains(CGPoint(x: px, y: py)) {
+                    return true
+                }
+            }
+        }
+
+        // Also sample the perimeter points (helps catch thin touches)
+        let perimeterSamples = max(12, samplesPerSide * 4)
+        for i in 0..<perimeterSamples {
+            let t = CGFloat(i) / CGFloat(perimeterSamples)
+            // walk rectangle perimeter: top, right, bottom, left
+            var point = CGPoint.zero
+            let segment = Int(t * 4.0)
+            let localT = (t * 4.0) - CGFloat(segment)
+            switch segment {
+            case 0: // top
+                point = CGPoint(x: rect.minX + localT * rect.width, y: rect.minY)
+            case 1: // right
+                point = CGPoint(x: rect.maxX, y: rect.minY + localT * rect.height)
+            case 2: // bottom
+                point = CGPoint(x: rect.maxX - localT * rect.width, y: rect.maxY)
+            default: // left
+                point = CGPoint(x: rect.minX, y: rect.maxY - localT * rect.height)
+            }
+            if path.contains(point) { return true }
+        }
+
+        return false
+    }
+
     // MARK: - Cleanup
     deinit {
         // Timer will be automatically invalidated when the view model is deallocated
