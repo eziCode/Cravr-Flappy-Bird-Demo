@@ -503,7 +503,8 @@ struct PixelTitle: View {
                 color: UIColor(colors[0]), 
                 outlineColor: UIColor.black
             )
-            .frame(height: 40)
+            .scaleEffect(x: 1.5, y: 1.25) // 50% fatter, 25% taller
+            .frame(height: 50)
             
             // Second line - SLOTH
             PixelText(
@@ -512,7 +513,8 @@ struct PixelTitle: View {
                 color: UIColor(colors[1]), 
                 outlineColor: UIColor.black
             )
-            .frame(height: 40)
+            .scaleEffect(x: 1.5, y: 1.25) // 50% fatter, 25% taller
+            .frame(height: 50)
         }
         .padding(.horizontal, 6)
     }
