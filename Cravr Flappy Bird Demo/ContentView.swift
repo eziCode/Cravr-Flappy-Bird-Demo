@@ -477,17 +477,6 @@ struct SlothIcon: View {
     }
 }
 
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
-        return path
-    }
-}
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
@@ -506,16 +495,17 @@ struct PixelTitle: View {
     ]
     
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 2) {
             ForEach(Array(text.enumerated()), id: \.offset) { index, letter in
                 if letter == " " {
-                    Spacer().frame(width: 18)
+                    Spacer().frame(width: 12)
                 } else {
                     let color = colors[index % colors.count]
-                    PixelLetter(char: letter, color: color, size: 36)
+                    PixelLetter(char: letter, color: color, size: 28)
                 }
             }
         }
+        .padding(.horizontal, 8)
         .onAppear {
             // Debug: Check if PressStart2P font is available
             print("PressStart2P font available: \(UIFont(name: "PressStart2P-Regular", size: 36) != nil)")
@@ -553,7 +543,7 @@ struct PixelLetter: View {
 
     var body: some View {
         ZStack {
-            // 1px hard outline by duplicating text in 8 directions
+            // Clean 1px outline - 8 directions for complete coverage
             Group {
                 Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1, y: 0)
                 Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1, y: 0)
@@ -568,8 +558,9 @@ struct PixelLetter: View {
             Text(String(char))
                 .font(pixelFont)
                 .foregroundColor(color)
-                .shadow(color: Color.black.opacity(0.6), radius: 0, x: 2, y: 3)
+                .shadow(color: Color.black.opacity(0.5), radius: 0, x: 1, y: 1)
         }
+        .padding(.horizontal, 1) // Ensure outline doesn't get clipped
         .drawingGroup()
     }
 }
