@@ -10,22 +10,22 @@ import SwiftUI
 struct PixelTitle: View {
     var text: String = "FLAPPY SLOTH"
     
-    // Flappy Bird style colors - vibrant and distinct per letter
+    // App theme colors - using Cravr color palette
     let flappyColors: [Color] = [
-        Color(hex: "f7ec59"), // Bright Yellow (F)
-        Color(hex: "ff69b4"), // Vibrant Pink (L) 
-        Color(hex: "87ceeb"), // Light Sky Blue (A)
-        Color(hex: "4169e1"), // Medium Royal Blue (P)
-        Color(hex: "32cd32"), // Bright Lime Green (P)
-        Color(hex: "9370db"), // Medium Lavender Purple (Y)
+        Color(hex: "f7ec59"), // Maize (F)
+        Color(hex: "fa7921"), // Pumpkin (L) 
+        Color(hex: "92dce5"), // Non Photo Blue (A)
+        Color(hex: "f7ec59"), // Maize (P)
+        Color(hex: "fa7921"), // Pumpkin (P)
+        Color(hex: "92dce5"), // Non Photo Blue (Y)
     ]
     
     let slothColors: [Color] = [
-        Color(hex: "9370db"), // Medium Lavender Purple (S)
-        Color(hex: "f7ec59"), // Bright Yellow (L)
-        Color(hex: "ff69b4"), // Vibrant Pink (O)
-        Color(hex: "87ceeb"), // Light Sky Blue (T)
-        Color(hex: "4169e1"), // Medium Royal Blue (H)
+        Color(hex: "92dce5"), // Non Photo Blue (S)
+        Color(hex: "f7ec59"), // Maize (L)
+        Color(hex: "fa7921"), // Pumpkin (O)
+        Color(hex: "92dce5"), // Non Photo Blue (T)
+        Color(hex: "f7ec59"), // Maize (H)
     ]
     
     var body: some View {
