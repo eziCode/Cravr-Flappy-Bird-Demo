@@ -74,7 +74,6 @@ struct MenuView: View {
                 // Back Button (TODO)
                 Button(action: {
                     // TODO: Implement back button functionality to dismiss to rest of app
-                    print("Back button tapped - TODO: implement dismiss functionality")
                 }) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)

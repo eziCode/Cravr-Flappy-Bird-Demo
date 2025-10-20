@@ -41,19 +41,15 @@ class GameViewModel: ObservableObject {
     
     // MARK: - Game Control
     func startGame() {
-        print("Starting game...")
         gameState = .playing
         sloth.reset()
         score = 0
         pipes = [Pipe(x: GameConstants.screenWidth + 100, topHeight: CGFloat.random(in: GameConstants.easyPipeHeightRange))]
         hasPlayedOnce = true
         startGameTimer()
-        print("Game started. gameState: \(gameState)")
     }
     
     func resetGame() {
-        print("Resetting to menu...")
-        
         // Update high score if current score is higher
         if score > highScore {
             highScore = score
@@ -65,11 +61,9 @@ class GameViewModel: ObservableObject {
         sloth.reset()
         score = 0
         pipes = []
-        print("Game reset to menu. gameState: \(gameState), highScore: \(highScore)")
     }
     
     func handleTap() {
-        print("Tap detected! gameState: \(gameState)")
         if gameState == .playing {
             sloth.jump(with: GameConstants.jump)
             animateSlothScale()
@@ -164,7 +158,6 @@ class GameViewModel: ObservableObject {
             )
             
             if sloth.frame.intersects(topRect) || sloth.frame.intersects(bottomRect) {
-                print("Game over - pipe collision!")
                 return true
             }
         }
@@ -173,7 +166,6 @@ class GameViewModel: ObservableObject {
     
     private func checkBoundaryCollisions() -> Bool {
         if sloth.y + 15 > GameConstants.screenCenter || sloth.y - 15 < -GameConstants.screenCenter {
-            print("Game over - boundary collision! slothY: \(sloth.y)")
             return true
         }
         return false

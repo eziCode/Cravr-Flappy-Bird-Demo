@@ -49,7 +49,7 @@ final class Haptics {
             hapticEngine = try CHHapticEngine()
             try hapticEngine?.start()
         } catch {
-            print("Core Haptics setup failed: \(error)")
+            // Core Haptics setup failed
         }
     }
 
@@ -83,7 +83,7 @@ final class Haptics {
             let player = try hapticEngine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("Bubble pop haptic failed: \(error)")
+            // Bubble pop haptic failed
         }
     }
 
@@ -161,7 +161,7 @@ final class Haptics {
             try player?.start(atTime: 0)
             activePlayers[dotIndex] = player
         } catch {
-            print("Failed to start continuous haptic for dot \(dotIndex): \(error)")
+            // Failed to start continuous haptic
         }
     }
     
@@ -170,7 +170,7 @@ final class Haptics {
             do {
                 try player.stop(atTime: 0)
             } catch {
-                print("Failed to stop haptic for dot \(dotIndex): \(error)")
+                // Failed to stop haptic
             }
             activePlayers.removeValue(forKey: dotIndex)
         }
@@ -312,7 +312,7 @@ final class Haptics {
             try player?.start(atTime: 0)
             inflationPlayers[dotIndex] = player
         } catch {
-            print("Failed to start inflation haptic for dot \(dotIndex): \(error)")
+            // Failed to start inflation haptic
         }
     }
     
@@ -344,7 +344,7 @@ final class Haptics {
             
             try player.sendParameters([intensityParam, sharpnessParam], atTime: 0)
         } catch {
-            print("Failed to update inflation haptic for dot \(dotIndex): \(error)")
+            // Failed to update inflation haptic
         }
     }
     
@@ -353,7 +353,7 @@ final class Haptics {
             do {
                 try player.stop(atTime: 0)
             } catch {
-                print("Failed to stop inflation haptic for dot \(dotIndex): \(error)")
+                // Failed to stop inflation haptic
             }
             inflationPlayers.removeValue(forKey: dotIndex)
         }
@@ -368,7 +368,7 @@ final class Haptics {
             do {
                 try player.stop(atTime: 0)
             } catch {
-                print("Failed to stop haptic for dot \(index): \(error)")
+                // Failed to stop haptic
             }
         }
         activePlayers.removeAll()
@@ -378,7 +378,7 @@ final class Haptics {
             do {
                 try player.stop(atTime: 0)
             } catch {
-                print("Failed to stop inflation haptic for dot \(index): \(error)")
+                // Failed to stop inflation haptic
             }
         }
         inflationPlayers.removeAll()
