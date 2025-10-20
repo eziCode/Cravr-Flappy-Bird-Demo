@@ -495,32 +495,17 @@ struct PixelTitle: View {
     ]
     
     var body: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: 0) {
             ForEach(Array(text.enumerated()), id: \.offset) { index, letter in
                 if letter == " " {
-                    Spacer().frame(width: 12)
+                    Spacer().frame(width: 6)
                 } else {
                     let color = colors[index % colors.count]
-                    PixelLetter(char: letter, color: color, size: 28)
+                    PixelLetter(char: letter, color: color, size: 40)
                 }
             }
         }
-        .padding(.horizontal, 8)
-        .onAppear {
-            // Debug: Check if PressStart2P font is available
-            print("PressStart2P font available: \(UIFont(name: "PressStart2P-Regular", size: 36) != nil)")
-            
-            // Debug: List all available font families
-            print("Available font families:")
-            for family in UIFont.familyNames.sorted() {
-                print("  \(family)")
-                for font in UIFont.fontNames(forFamilyName: family) {
-                    if font.lowercased().contains("pressstart") {
-                        print("    -> \(font)")
-                    }
-                }
-            }
-        }
+        .padding(.horizontal, 4)
     }
 }
 
