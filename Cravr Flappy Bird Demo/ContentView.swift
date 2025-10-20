@@ -550,7 +550,8 @@ struct PixelText: UIViewRepresentable {
                 .font: font,
                 .foregroundColor: color,
                 .strokeColor: outlineColor,
-                .strokeWidth: strokeWidth
+                .strokeWidth: strokeWidth,
+                .kern: -2 // Negative letter spacing to bring letters closer
             ]
         )
     }
