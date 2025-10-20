@@ -10,37 +10,49 @@ import SwiftUI
 struct PixelTitle: View {
     var text: String = "FLAPPY SLOTH"
     
-    // Define retro palette
-    let colors: [Color] = [
-        Color(hex: "f7ec59"), // Maize
-        Color(hex: "92dce5"), // Non Photo Blue
-        Color(hex: "fa7921"), // Pumpkin
-        Color(hex: "1cd91f")  // SGBus Green
+    // Flappy Bird style colors - vibrant and distinct per letter
+    let flappyColors: [Color] = [
+        Color(hex: "f7ec59"), // Bright Yellow (F)
+        Color(hex: "ff69b4"), // Vibrant Pink (L) 
+        Color(hex: "87ceeb"), // Light Sky Blue (A)
+        Color(hex: "4169e1"), // Medium Royal Blue (P)
+        Color(hex: "32cd32"), // Bright Lime Green (P)
+        Color(hex: "9370db"), // Medium Lavender Purple (Y)
+    ]
+    
+    let slothColors: [Color] = [
+        Color(hex: "9370db"), // Medium Lavender Purple (S)
+        Color(hex: "f7ec59"), // Bright Yellow (L)
+        Color(hex: "ff69b4"), // Vibrant Pink (O)
+        Color(hex: "87ceeb"), // Light Sky Blue (T)
+        Color(hex: "4169e1"), // Medium Royal Blue (H)
     ]
     
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 0) { // No spacing between lines
             // First line - FLAPPY
-            PixelText(
-                text: "FLAPPY", 
-                fontSize: 36, 
-                color: UIColor(colors[0]), 
-                outlineColor: UIColor.black
-            )
-            .scaleEffect(x: 1.5, y: 1.25) // 50% fatter, 25% taller
-            .frame(height: 50)
+            HStack(spacing: 0) { // No spacing between letters
+                ForEach(Array("FLAPPY".enumerated()), id: \.offset) { index, char in
+                    PixelLetter(
+                        char: char,
+                        color: flappyColors[index % flappyColors.count],
+                        size: 44
+                    )
+                }
+            }
             
-            // Second line - SLOTH
-            PixelText(
-                text: "SLOTH", 
-                fontSize: 36, 
-                color: UIColor(colors[1]), 
-                outlineColor: UIColor.black
-            )
-            .scaleEffect(x: 1.5, y: 1.25) // 50% fatter, 25% taller
-            .frame(height: 50)
+            // Second line - SLOTH  
+            HStack(spacing: 0) { // No spacing between letters
+                ForEach(Array("SLOTH".enumerated()), id: \.offset) { index, char in
+                    PixelLetter(
+                        char: char,
+                        color: slothColors[index % slothColors.count],
+                        size: 44
+                    )
+                }
+            }
         }
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 20)
     }
 }
 
@@ -81,12 +93,13 @@ struct PixelText: UIViewRepresentable {
     }
 }
 
-// MARK: - Pixel Letter (crisp 1px outline around pixel font)
+// MARK: - Pixel Letter (Flappy Bird style - thick but readable)
 struct PixelLetter: View {
     let char: Character
     let color: Color
     let size: CGFloat
-    var widthScale: CGFloat = 1.0
+    var widthScale: CGFloat = 1.5
+    var outlineOffset: CGFloat = 1.5 // match the max offset in outline
 
     private var pixelFont: Font { 
         if let uiFont = UIFont(name: "PressStart2P-Regular", size: size) {
@@ -98,26 +111,24 @@ struct PixelLetter: View {
 
     var body: some View {
         ZStack {
-            // 1px outline scaled properly
+            // Outline
             Group {
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1 * widthScale, y: 0)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1 * widthScale, y: 0)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -outlineOffset, y: 0)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: outlineOffset, y: 0)
                 Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 0, y: -1)
                 Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 0, y: 1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1 * widthScale, y: -1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1 * widthScale, y: -1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1 * widthScale, y: 1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1 * widthScale, y: 1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -outlineOffset, y: -1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: outlineOffset, y: -1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -outlineOffset, y: 1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: outlineOffset, y: 1)
             }
             
-            // Main colored letter
+            // Main letter
             Text(String(char))
                 .font(pixelFont)
                 .foregroundColor(color)
-                .shadow(color: Color.black.opacity(0.5), radius: 0, x: 1 * widthScale, y: 1)
         }
+        // Scale from leading so letters touch left edge
         .scaleEffect(x: widthScale, y: 1.0, anchor: .center)
-        .padding(.horizontal, 1)
-        .drawingGroup()
     }
 }
