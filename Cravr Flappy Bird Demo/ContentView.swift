@@ -495,17 +495,31 @@ struct PixelTitle: View {
     ]
     
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(Array(text.enumerated()), id: \.offset) { index, letter in
-                if letter == " " {
-                    Spacer().frame(width: 6)
-                } else {
+        let words = text.split(separator: " ")
+        let firstWord = words.first.map(String.init) ?? text
+        let secondWord = words.dropFirst().joined(separator: " ")
+
+        VStack(spacing: 4) {
+            // First line
+            HStack(spacing: 0) {
+                ForEach(Array(firstWord.enumerated()), id: \.offset) { index, letter in
                     let color = colors[index % colors.count]
-                    PixelLetter(char: letter, color: color, size: 40)
+                    PixelLetter(char: letter, color: color, size: 36, widthScale: 1.25)
+                }
+            }
+            // Second line (if any)
+            if !secondWord.isEmpty {
+                HStack(spacing: 0) {
+                    ForEach(Array(secondWord.enumerated()), id: \.offset) { index, letter in
+                        let color = colors[(index + firstWord.count) % colors.count]
+                        if letter == " " { Spacer().frame(width: 8) } else {
+                            PixelLetter(char: letter, color: color, size: 36, widthScale: 1.25)
+                        }
+                    }
                 }
             }
         }
-        .padding(.horizontal, 4)
+        .padding(.horizontal, 6)
     }
 }
 
@@ -514,38 +528,38 @@ struct PixelLetter: View {
     let char: Character
     let color: Color
     let size: CGFloat
+    var widthScale: CGFloat = 1.0
 
-    // Fallback to monospaced if custom pixel font isn't available
     private var pixelFont: Font { 
         if let uiFont = UIFont(name: "PressStart2P-Regular", size: size) {
             return Font(uiFont)
         } else {
-            // Debug: Check if font is available
-            print("PressStart2P-Regular font not found, using monospaced fallback")
             return .system(size: size, design: .monospaced)
         }
     }
 
     var body: some View {
         ZStack {
-            // Clean 1px outline - 8 directions for complete coverage
+            // 1px outline scaled properly
             Group {
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1, y: 0)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1, y: 0)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1 * widthScale, y: 0)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1 * widthScale, y: 0)
                 Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 0, y: -1)
                 Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 0, y: 1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1, y: -1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1, y: -1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1, y: 1)
-                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1, y: 1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1 * widthScale, y: -1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1 * widthScale, y: -1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1 * widthScale, y: 1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1 * widthScale, y: 1)
             }
-            // Main colored glyph
+            
+            // Main colored letter
             Text(String(char))
                 .font(pixelFont)
                 .foregroundColor(color)
-                .shadow(color: Color.black.opacity(0.5), radius: 0, x: 1, y: 1)
+                .shadow(color: Color.black.opacity(0.5), radius: 0, x: 1 * widthScale, y: 1)
         }
-        .padding(.horizontal, 1) // Ensure outline doesn't get clipped
+        .scaleEffect(x: widthScale, y: 1.0, anchor: .center)
+        .padding(.horizontal, 1)
         .drawingGroup()
     }
 }
