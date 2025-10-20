@@ -57,11 +57,10 @@ struct ContentView: View {
                     // Title Graphic
                     VStack(spacing: 20) {
                         // Game Title
-                        Text("FLAPPY SLOTH")
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
-                            .foregroundColor(Color(hex: "f7ec59")) // Maize
-                            .shadow(color: .black, radius: 3, x: 2, y: 2)
-                            .multilineTextAlignment(.center)
+                        PixelTitle()
+                            .scaleEffect(hasPlayedOnce ? 1.0 : 1.1)
+                            .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: hasPlayedOnce)
+
                         
                         // Sloth Logo
                         SlothIcon(size: 100)
@@ -492,6 +491,86 @@ struct Triangle: Shape {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+struct PixelTitle: View {
+    var text: String = "FLAPPY SLOTH"
+    
+    // Define retro palette
+    let colors: [Color] = [
+        Color(hex: "f7ec59"), // Maize
+        Color(hex: "92dce5"), // Non Photo Blue
+        Color(hex: "fa7921"), // Pumpkin
+        Color(hex: "1cd91f")  // SGBus Green
+    ]
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(Array(text.enumerated()), id: \.offset) { index, letter in
+                if letter == " " {
+                    Spacer().frame(width: 18)
+                } else {
+                    let color = colors[index % colors.count]
+                    PixelLetter(char: letter, color: color, size: 36)
+                }
+            }
+        }
+        .onAppear {
+            // Debug: Check if PressStart2P font is available
+            print("PressStart2P font available: \(UIFont(name: "PressStart2P-Regular", size: 36) != nil)")
+            
+            // Debug: List all available font families
+            print("Available font families:")
+            for family in UIFont.familyNames.sorted() {
+                print("  \(family)")
+                for font in UIFont.fontNames(forFamilyName: family) {
+                    if font.lowercased().contains("pressstart") {
+                        print("    -> \(font)")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Pixel Letter (crisp 1px outline around pixel font)
+struct PixelLetter: View {
+    let char: Character
+    let color: Color
+    let size: CGFloat
+
+    // Fallback to monospaced if custom pixel font isn't available
+    private var pixelFont: Font { 
+        if let uiFont = UIFont(name: "PressStart2P-Regular", size: size) {
+            return Font(uiFont)
+        } else {
+            // Debug: Check if font is available
+            print("PressStart2P-Regular font not found, using monospaced fallback")
+            return .system(size: size, design: .monospaced)
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            // 1px hard outline by duplicating text in 8 directions
+            Group {
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1, y: 0)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1, y: 0)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 0, y: -1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 0, y: 1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1, y: -1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1, y: -1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: -1, y: 1)
+                Text(String(char)).font(pixelFont).foregroundColor(.black).offset(x: 1, y: 1)
+            }
+            // Main colored glyph
+            Text(String(char))
+                .font(pixelFont)
+                .foregroundColor(color)
+                .shadow(color: Color.black.opacity(0.6), radius: 0, x: 2, y: 3)
+        }
+        .drawingGroup()
     }
 }
 

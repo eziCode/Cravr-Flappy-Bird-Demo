@@ -10,9 +10,22 @@
 		E14C730C2EA1533B00168511 /* Cravr Flappy Bird Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cravr Flappy Bird Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E138BEC32EA6997300F5F3B2 /* Exceptions for "Cravr Flappy Bird Demo" folder in "Cravr Flappy Bird Demo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Cravr-Flappy-Bird-Demo-Info.plist",
+			);
+			target = E14C730B2EA1533B00168511 /* Cravr Flappy Bird Demo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E14C730E2EA1533B00168511 /* Cravr Flappy Bird Demo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E138BEC32EA6997300F5F3B2 /* Exceptions for "Cravr Flappy Bird Demo" folder in "Cravr Flappy Bird Demo" target */,
+			);
 			path = "Cravr Flappy Bird Demo";
 			sourceTree = "<group>";
 		};
@@ -256,6 +269,7 @@
 				DEVELOPMENT_TEAM = G8BA878ZR9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Cravr-Flappy-Bird-Demo-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +302,7 @@
 				DEVELOPMENT_TEAM = G8BA878ZR9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Cravr-Flappy-Bird-Demo-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
