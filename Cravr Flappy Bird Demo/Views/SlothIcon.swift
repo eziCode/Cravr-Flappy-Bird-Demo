@@ -63,21 +63,6 @@ struct SlothIcon: View {
                 .fill(noseColor)
                 .frame(width: size * 0.14, height: size * 0.1)
                 .offset(y: size * 0.05)
-
-            // Mouth (gentle smile)
-            Path { path in
-                let mouthWidth = size * 0.25
-                let mouthHeight = size * 0.08
-                path.addArc(
-                    center: CGPoint(x: 0, y: size * 0.08),
-                    radius: mouthWidth / 2,
-                    startAngle: .degrees(20),
-                    endAngle: .degrees(160),
-                    clockwise: false
-                )
-            }
-            .stroke(noseColor, lineWidth: size * 0.02)
-            .offset(y: size * 0.04)
         }
     }
 }
