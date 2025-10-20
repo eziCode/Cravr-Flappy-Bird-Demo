@@ -495,31 +495,62 @@ struct PixelTitle: View {
     ]
     
     var body: some View {
-        let words = text.split(separator: " ")
-        let firstWord = words.first.map(String.init) ?? text
-        let secondWord = words.dropFirst().joined(separator: " ")
-
         VStack(spacing: 4) {
-            // First line
-            HStack(spacing: 0) {
-                ForEach(Array(firstWord.enumerated()), id: \.offset) { index, letter in
-                    let color = colors[index % colors.count]
-                    PixelLetter(char: letter, color: color, size: 36, widthScale: 1.25)
-                }
-            }
-            // Second line (if any)
-            if !secondWord.isEmpty {
-                HStack(spacing: 0) {
-                    ForEach(Array(secondWord.enumerated()), id: \.offset) { index, letter in
-                        let color = colors[(index + firstWord.count) % colors.count]
-                        if letter == " " { Spacer().frame(width: 8) } else {
-                            PixelLetter(char: letter, color: color, size: 36, widthScale: 1.25)
-                        }
-                    }
-                }
-            }
+            // First line - FLAPPY
+            PixelText(
+                text: "FLAPPY", 
+                fontSize: 36, 
+                color: UIColor(colors[0]), 
+                outlineColor: UIColor.black
+            )
+            .frame(height: 40)
+            
+            // Second line - SLOTH
+            PixelText(
+                text: "SLOTH", 
+                fontSize: 36, 
+                color: UIColor(colors[1]), 
+                outlineColor: UIColor.black
+            )
+            .frame(height: 40)
         }
         .padding(.horizontal, 6)
+    }
+}
+
+// MARK: - Pixel Text with proper stroke outline
+struct PixelText: UIViewRepresentable {
+    let text: String
+    let fontSize: CGFloat
+    let color: UIColor
+    let outlineColor: UIColor
+
+    func makeUIView(context: Context) -> UILabel {
+        let label = UILabel()
+        label.attributedText = attributedString()
+        label.textAlignment = .center
+        label.adjustsFontSizeToFitWidth = false
+        label.numberOfLines = 1
+        return label
+    }
+
+    func updateUIView(_ uiView: UILabel, context: Context) {
+        uiView.attributedText = attributedString()
+    }
+
+    private func attributedString() -> NSAttributedString {
+        let font = UIFont(name: "PressStart2P-Regular", size: fontSize) ?? UIFont.monospacedSystemFont(ofSize: fontSize, weight: .regular)
+        let strokeWidth: CGFloat = -2 // negative = stroke + fill
+
+        return NSAttributedString(
+            string: text,
+            attributes: [
+                .font: font,
+                .foregroundColor: color,
+                .strokeColor: outlineColor,
+                .strokeWidth: strokeWidth
+            ]
+        )
     }
 }
 
