@@ -22,7 +22,7 @@ class SoundManager {
             try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try audioSession.setActive(true)
         } catch {
-            print("Failed to configure audio session: \(error)")
+            // Audio session configuration failed
         }
         
         audioEngine = AVAudioEngine()
@@ -39,7 +39,7 @@ class SoundManager {
             try audioEngine.start()
             playerNode.play()
         } catch {
-            print("Failed to start audio engine: \(error)")
+            // Audio engine start failed
         }
     }
     

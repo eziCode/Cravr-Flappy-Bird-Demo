@@ -41,18 +41,15 @@ class GameViewModel: ObservableObject {
     
     // MARK: - Game Control
     func startGame() {
-        print("Starting game...")
         gameState = .playing
         sloth.reset()
         score = 0
         pipes = [Pipe(x: GameConstants.screenWidth + 100, topHeight: CGFloat.random(in: GameConstants.easyPipeHeightRange))]
         hasPlayedOnce = true
         startGameTimer()
-        print("Game started. gameState: \(gameState)")
     }
     
     func resetGame() {
-        print("Resetting to menu...")
         
         // Update high score if current score is higher
         if score > highScore {
@@ -65,11 +62,9 @@ class GameViewModel: ObservableObject {
         sloth.reset()
         score = 0
         pipes = []
-        print("Game reset to menu. gameState: \(gameState), highScore: \(highScore)")
     }
     
     func handleTap() {
-        print("Tap detected! gameState: \(gameState)")
         if gameState == .playing {
             sloth.jump(with: GameConstants.jump)
             animateSlothScale()
@@ -169,7 +164,6 @@ class GameViewModel: ObservableObject {
 
                 // Collide if not inside either cutout
                 if !(inBottomRightCutout || inBottomLeftCutout) {
-                    print("💥 Game over - TOP pipe collision! (matches new bounding shape)")
                     return true
                 }
             }
@@ -198,7 +192,6 @@ class GameViewModel: ObservableObject {
                     (((triangleSize2 - localX) + (triangleSize2 - localY)) > triangleSize2)
 
                 if !(inTopRightCutout || inTopLeftCutout) {
-                    print("💥 Game over - BOTTOM pipe collision! (matches new bounding shape)")
                     return true
                 }
             }
@@ -217,14 +210,12 @@ class GameViewModel: ObservableObject {
             if !pipes[i].passed && pipes[i].x + GameConstants.pipeWidth < slothX {
                 pipes[i].passed = true
                 score += 1
-                print("Score incremented! New score: \(score)")
             }
         }
     }
     
     private func checkBoundaryCollisions() -> Bool {
         if sloth.y + 15 > GameConstants.screenCenter || sloth.y - 15 < -GameConstants.screenCenter {
-            print("Game over - boundary collision! slothY: \(sloth.y)")
             return true
         }
         return false

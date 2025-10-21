@@ -56,11 +56,11 @@ struct PipeView: View {
                     .scaleEffect(x: 1, y: -1) // Only reflection, no width scaling
                     .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
                 
-                Rectangle()
-                    .fill(Color.red.opacity(0.3))
-                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
-                    .clipShape(TriangleCutRectangle(cutCorners: [.bottomLeft, .bottomRight], triangleSize: 40, triangleSize2: 20))
-                    .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
+                // Rectangle()
+                //     .fill(Color.red.opacity(0.3))
+                //     .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
+                //     .clipShape(TriangleCutRectangle(cutCorners: [.bottomLeft, .bottomRight], triangleSize: 40, triangleSize2: 20))
+                //     .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
             }
             
             // Bottom pipe - extended beyond screen
@@ -72,11 +72,11 @@ struct PipeView: View {
                     .scaleEffect(x: 0.6, y: 1) // No scaling
                     .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
                 
-                Rectangle()
-                    .fill(Color.red.opacity(0.3))
-                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
-                    .clipShape(TriangleCutRectangle(cutCorners: [.topRight, .topLeft], triangleSize: 40, triangleSize2: 20))
-                    .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
+                // Rectangle()
+                //     .fill(Color.red.opacity(0.3))
+                //     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                //     .clipShape(TriangleCutRectangle(cutCorners: [.topRight, .topLeft], triangleSize: 40, triangleSize2: 20))
+                //     .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
             }
         }
     }
