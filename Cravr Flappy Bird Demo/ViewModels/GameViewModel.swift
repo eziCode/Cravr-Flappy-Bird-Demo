@@ -133,40 +133,67 @@ class GameViewModel: ObservableObject {
     }
     
     private func checkCollisions() -> Bool {
-        let slothX: CGFloat = 100 // Sloth X position from GameView
-        let slothY: CGFloat = sloth.y + GameConstants.screenCenter // Sloth Y position
-        let slothRadius: CGFloat = 20 // Approximate sloth collision radius
-        
+        let slothX: CGFloat = 100
+        let slothY: CGFloat = sloth.y + GameConstants.screenCenter
+        let slothRadius: CGFloat = 20
+        let triangleSize: CGFloat = 40 // Same as in TriangleCutRectangle
+
         for pipe in pipes {
-            // Top pipe collision - match the red box exactly
-            let topPipeX = pipe.x - 19.5 // Match the offset from red box
-            let topPipeY = pipe.topHeight / 2 - 150 // Match the offset from red box
+            // --- TOP PIPE ---
+            let topPipeX = pipe.x - 19.5
+            let topPipeY = pipe.topHeight / 2 - 150
             let topPipeWidth = GameConstants.pipeWidth
             let topPipeHeight = pipe.topHeight + 300
             
-            // Bottom pipe collision - match the red box exactly
-            let bottomPipeX = pipe.x - 19.5 // Match the offset from red box
-            let bottomPipeY = UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150 // Match the offset from red box
+            // Bounding rect check (fast reject)
+            if abs(slothX - topPipeX) < (slothRadius + topPipeWidth / 2),
+            abs(slothY - topPipeY) < (slothRadius + topPipeHeight / 2) {
+
+                // Convert sloth position to local coordinates of the top pipe
+                let localX = slothX - (topPipeX - topPipeWidth / 2)
+                let localY = slothY - (topPipeY - topPipeHeight / 2)
+                
+                // Check if sloth is inside the triangle-cut zone (bottom-right corner)
+                let inCutout =
+                    (localX > topPipeWidth - triangleSize) &&
+                    (localY > topPipeHeight - triangleSize) &&
+                    ((localX - (topPipeWidth - triangleSize)) + (localY - (topPipeHeight - triangleSize)) > triangleSize)
+                
+                if !inCutout {
+                    print("Game over - top pipe collision! (matches visual red box)")
+                    return true
+                }
+            }
+
+            // --- BOTTOM PIPE ---
+            let bottomPipeX = pipe.x - 19.5
+            let bottomPipeY = UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150
             let bottomPipeWidth = GameConstants.pipeWidth
             let bottomPipeHeight = pipe.bottomHeight + 300
             
-            // Check collision with top pipe
-            if abs(slothX - topPipeX) < (slothRadius + topPipeWidth/2) &&
-               abs(slothY - topPipeY) < (slothRadius + topPipeHeight/2) {
-                print("Game over - top pipe collision! slothY: \(slothY), pipeY: \(topPipeY)")
-                return true
-            }
-            
-            // Check collision with bottom pipe
-            if abs(slothX - bottomPipeX) < (slothRadius + bottomPipeWidth/2) &&
-               abs(slothY - bottomPipeY) < (slothRadius + bottomPipeHeight/2) {
-                print("Game over - bottom pipe collision! slothY: \(slothY), pipeY: \(bottomPipeY)")
-                return true
+            if abs(slothX - bottomPipeX) < (slothRadius + bottomPipeWidth / 2),
+            abs(slothY - bottomPipeY) < (slothRadius + bottomPipeHeight / 2) {
+                
+                // Convert sloth position to local coordinates of bottom pipe
+                let localX = slothX - (bottomPipeX - bottomPipeWidth / 2)
+                let localY = slothY - (bottomPipeY - bottomPipeHeight / 2)
+                
+                // Check if sloth is inside the triangle-cut zone (top-right corner)
+                let inCutout =
+                    (localX > bottomPipeWidth - triangleSize) &&
+                    (localY < triangleSize) &&
+                    ((localX - (bottomPipeWidth - triangleSize)) + (triangleSize - localY) > triangleSize)
+                
+                if !inCutout {
+                    print("Game over - bottom pipe collision! (matches visual red box)")
+                    return true
+                }
             }
         }
         
         return false
     }
+
     
     private func checkScoreIncrement() {
         let slothX: CGFloat = 100 // Sloth X position
