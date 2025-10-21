@@ -59,6 +59,7 @@ struct PipeView: View {
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
                     .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
+                    .clipShape(TriangleCutRectangle(cutCorners: [.bottomRight], triangleSize: 40))
                     .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
             }
             
@@ -74,8 +75,60 @@ struct PipeView: View {
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
                     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                    .clipShape(TriangleCutRectangle(cutCorners: [.topRight], triangleSize: 40))
                     .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
             }
         }
+    }
+}
+
+struct TriangleCutRectangle: Shape {
+    let cutCorners: [UIRectCorner]
+    let triangleSize: CGFloat
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        // Start with the full rectangle
+        path.addRect(rect)
+        
+        // Cut out triangles from specified corners
+        for corner in cutCorners {
+            let trianglePath = createTrianglePath(in: rect, corner: corner, size: triangleSize)
+            path = path.subtracting(trianglePath)
+        }
+        
+        return path
+    }
+    
+    private func createTrianglePath(in rect: CGRect, corner: UIRectCorner, size: CGFloat) -> Path {
+        var trianglePath = Path()
+        
+        switch corner {
+        case .topRight:
+            // Triangle pointing down and left from top-right corner
+            let topRight = CGPoint(x: rect.maxX, y: rect.minY)
+            let trianglePoint1 = CGPoint(x: rect.maxX - size, y: rect.minY)
+            let trianglePoint2 = CGPoint(x: rect.maxX, y: rect.minY + size)
+            trianglePath.move(to: topRight)
+            trianglePath.addLine(to: trianglePoint1)
+            trianglePath.addLine(to: trianglePoint2)
+            trianglePath.closeSubpath()
+            
+        case .bottomRight:
+            // Triangle pointing up and left from bottom-right corner
+            let bottomRight = CGPoint(x: rect.maxX, y: rect.maxY)
+            let trianglePoint1 = CGPoint(x: rect.maxX - size, y: rect.maxY)
+            let trianglePoint2 = CGPoint(x: rect.maxX, y: rect.maxY - size)
+            trianglePath.move(to: bottomRight)
+            trianglePath.addLine(to: trianglePoint1)
+            trianglePath.addLine(to: trianglePoint2)
+            trianglePath.closeSubpath()
+            
+        default:
+            break
+        }
+        
+        return trianglePath
     }
 }
