@@ -43,192 +43,112 @@ struct GameView: View {
     }
 }
 
-import SwiftUI
-
 struct PipeView: View {
     let pipe: Pipe
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Top pipe
-            ZStack(alignment: .top) {
-                TreePipeShape()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(hex: "#3B6B33"),
-                                Color(hex: "#214B25")
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight)
-                    .overlay(TreePipeDetails(), alignment: .center)
-                    .overlay(LeavesOnPipe(isBottom: false), alignment: .center)
-                    .overlay(
-                        PipeTopCap()
-                            .frame(height: 20)
-                            .offset(y: -10)
-                        , alignment: .top
-                    )
-                    .overlay(
-                        PipeTopCap()
-                            .frame(height: 20)
-                            .offset(y: 10)
-                        , alignment: .bottom
-                    )
-                    .shadow(color: .black.opacity(0.3), radius: 4, x: 2, y: 2)
-            }
-            
-            Spacer().frame(height: GameConstants.pipeSpacing)
-            
-            // Bottom pipe
-            ZStack(alignment: .bottom) {
-                TreePipeShape()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(hex: "#214B25"),
-                                Color(hex: "#3B6B33")
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight)
-                    .overlay(TreePipeDetails(), alignment: .center)
-                    .overlay(LeavesOnPipe(isBottom: true), alignment: .center)
-                    .shadow(color: .black.opacity(0.3), radius: 4, x: 2, y: -2)
-            }
-        }
-        .position(x: pipe.x, y: GameConstants.screenCenter)
-    }
-}
-
-struct TreePipeShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path(roundedRect: rect, cornerRadius: rect.width / 4)
-        return path
-    }
-}
-
-struct TreePipeDetails: View {
-    var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-            
-            Path { path in
-                // Add subtle bark lines
-                path.move(to: CGPoint(x: w * 0.3, y: h * 0.1))
-                path.addLine(to: CGPoint(x: w * 0.3, y: h * 0.9))
-                
-                path.move(to: CGPoint(x: w * 0.7, y: h * 0.2))
-                path.addLine(to: CGPoint(x: w * 0.7, y: h * 0.85))
-            }
-            .stroke(Color.black.opacity(0.25), lineWidth: 2)
-            
-            // Bark knots
-            Circle()
-                .stroke(Color.black.opacity(0.25), lineWidth: 1.5)
-                .frame(width: w * 0.15, height: w * 0.08)
-                .offset(x: w * 0.15, y: h * 0.3)
-            
-            Circle()
-                .stroke(Color.black.opacity(0.25), lineWidth: 1.5)
-                .frame(width: w * 0.1, height: w * 0.05)
-                .offset(x: w * 0.6, y: h * 0.6)
-        }
-    }
-}
-
-struct PipeTopCap: View {
-    var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-            
+        ZStack {
+            // Top pipe - extended beyond screen
             ZStack {
-                Ellipse()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(hex: "#82B857"),
-                                Color(hex: "#4F7F33")
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .overlay(
-                        Ellipse()
-                            .stroke(Color.black.opacity(0.3), lineWidth: 2)
-                    )
+                Image("tree-trunk-pipe-image")
+                    .resizable()
+                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
+                    .scaleEffect(x: 1, y: -1) // Only reflection, no width scaling
+                    .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
                 
-                Ellipse()
-                    .inset(by: w * 0.15)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(hex: "#F3E58B"),
-                                Color(hex: "#C7A75C")
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .offset(y: h * 0.05)
+                // Rectangle()
+                //     .fill(Color.red.opacity(0.3))
+                //     .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
+                //     .clipShape(TriangleCutRectangle(cutCorners: [.bottomLeft, .bottomRight], triangleSize: 40, triangleSize2: 20))
+                //     .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
             }
-        }
-    }
-}
-
-struct LeavesOnPipe: View {
-    let isBottom: Bool
-    
-    var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
             
-            Group {
-                Leaf()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color(hex: "#5FAE3E"), Color(hex: "#3F7B2A")]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: w * 0.2, height: w * 0.1)
-                    .rotationEffect(.degrees(-20))
-                    .offset(x: -w * 0.55, y: isBottom ? h - h * 0.3 : h * 0.3)
+            // Bottom pipe - extended beyond screen
+            ZStack {
+                Image("tree-trunk-pipe-image")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                    .scaleEffect(x: 0.6, y: 1) // No scaling
+                    .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
                 
-                Leaf()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color(hex: "#5FAE3E"), Color(hex: "#3F7B2A")]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: w * 0.2, height: w * 0.1)
-                    .rotationEffect(.degrees(20))
-                    .offset(x: w * 0.55, y: isBottom ? h - h * 0.6 : h * 0.6)
+                // Rectangle()
+                //     .fill(Color.red.opacity(0.3))
+                //     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                //     .clipShape(TriangleCutRectangle(cutCorners: [.topRight, .topLeft], triangleSize: 40, triangleSize2: 20))
+                //     .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
             }
         }
     }
 }
 
-struct Leaf: Shape {
+struct TriangleCutRectangle: Shape {
+    let cutCorners: [UIRectCorner]
+    let triangleSize: CGFloat
+    let triangleSize2: CGFloat
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addQuadCurve(to: CGPoint(x: rect.midX, y: rect.maxY),
-                          control: CGPoint(x: rect.maxX, y: rect.midY))
-        path.addQuadCurve(to: CGPoint(x: rect.midX, y: rect.minY),
-                          control: CGPoint(x: rect.minX, y: rect.midY))
+        
+        // Start with the full rectangle
+        path.addRect(rect)
+        
+        // Cut out triangles from specified corners
+        for corner in cutCorners {
+            let trianglePath = createTrianglePath(in: rect, corner: corner, size: triangleSize, size2: triangleSize2)
+            path = path.subtracting(trianglePath)
+        }
+        
         return path
+    }
+    
+    private func createTrianglePath(in rect: CGRect, corner: UIRectCorner, size: CGFloat, size2: CGFloat) -> Path {
+        var trianglePath = Path()
+        
+        switch corner {
+        case .topRight:
+            // Triangle pointing down and left from top-right corner
+            let topRight = CGPoint(x: rect.maxX, y: rect.minY)
+            let trianglePoint1 = CGPoint(x: rect.maxX - size, y: rect.minY)
+            let trianglePoint2 = CGPoint(x: rect.maxX, y: rect.minY + size)
+            trianglePath.move(to: topRight)
+            trianglePath.addLine(to: trianglePoint1)
+            trianglePath.addLine(to: trianglePoint2)
+            trianglePath.closeSubpath()
+            
+        case .bottomRight:
+            // Triangle pointing up and left from bottom-right corner
+            let bottomRight = CGPoint(x: rect.maxX, y: rect.maxY)
+            let trianglePoint1 = CGPoint(x: rect.maxX - size, y: rect.maxY)
+            let trianglePoint2 = CGPoint(x: rect.maxX, y: rect.maxY - size)
+            trianglePath.move(to: bottomRight)
+            trianglePath.addLine(to: trianglePoint1)
+            trianglePath.addLine(to: trianglePoint2)
+            trianglePath.closeSubpath()
+            
+        case .topLeft:
+            // Triangle pointing down and right from top-left corner
+            let topLeft = CGPoint(x: rect.minX, y: rect.minY)
+            let trianglePoint1 = CGPoint(x: rect.minX + size2, y: rect.minY)
+            let trianglePoint2 = CGPoint(x: rect.minX, y: rect.minY + size2)
+            trianglePath.move(to: topLeft)
+            trianglePath.addLine(to: trianglePoint1)
+            trianglePath.addLine(to: trianglePoint2)
+            trianglePath.closeSubpath()
+            
+        case .bottomLeft:
+            // Triangle pointing up and right from bottom-left corner
+            let bottomLeft = CGPoint(x: rect.minX, y: rect.maxY)
+            let trianglePoint1 = CGPoint(x: rect.minX + size2, y: rect.maxY)
+            let trianglePoint2 = CGPoint(x: rect.minX, y: rect.maxY - size2)
+            trianglePath.move(to: bottomLeft)
+            trianglePath.addLine(to: trianglePoint1)
+            trianglePath.addLine(to: trianglePoint2)
+            trianglePath.closeSubpath()
+            
+        default:
+            break
+        }
+        
+        return trianglePath
     }
 }

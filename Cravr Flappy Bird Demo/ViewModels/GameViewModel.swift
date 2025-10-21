@@ -50,6 +50,7 @@ class GameViewModel: ObservableObject {
     }
     
     func resetGame() {
+        
         // Update high score if current score is higher
         if score > highScore {
             highScore = score
@@ -127,56 +128,79 @@ class GameViewModel: ObservableObject {
     }
     
     private func checkCollisions() -> Bool {
-        // Sample density (more samples => more accurate; 9x9 = 81 checks)
-        let sampleGrid = 9
+        let slothX: CGFloat = 100
+        let slothY: CGFloat = sloth.y + GameConstants.screenCenter
+        let slothRadius: CGFloat = 20
+
+        // These match the TriangleCutRectangle sizes
+        let triangleSize: CGFloat = 40   // For right corners
+        let triangleSize2: CGFloat = 20  // For left corners
 
         for pipe in pipes {
-            // Body rects (same as before)
-            let topRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth / 2,
-                y: 0,
-                width: GameConstants.pipeWidth,
-                height: pipe.topHeight
-            )
-            let bottomRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth / 2,
-                y: pipe.topHeight + GameConstants.pipeSpacing,
-                width: GameConstants.pipeWidth,
-                height: GameConstants.screenHeight - pipe.topHeight - GameConstants.pipeSpacing
-            )
+            // === TOP PIPE ===
+            let topPipeX = pipe.x - 19.5
+            let topPipeY = pipe.topHeight / 2 - 150
+            let topPipeWidth = GameConstants.pipeWidth
+            let topPipeHeight = pipe.topHeight + 300
 
-            // Build precise CGPaths for the top and bottom pipe (rounded rect + cap ellipse for top only)
-            let topPath = makePipeCGPath(forRect: topRect, capPosition: .top)
-            let bottomPath = makePipeCGPath(forRect: bottomRect, capPosition: .none)
+            // Fast bounding-box rejection
+            if abs(slothX - topPipeX) < (slothRadius + topPipeWidth / 2),
+            abs(slothY - topPipeY) < (slothRadius + topPipeHeight / 2) {
 
-            // Quick bounding-box reject
-            let slothBox = sloth.frame
+                // Convert sloth position to local coords of the top pipe
+                let localX = slothX - (topPipeX - topPipeWidth / 2)
+                let localY = slothY - (topPipeY - topPipeHeight / 2)
 
-            if !slothBox.intersects(topPath.boundingBox) && !slothBox.intersects(bottomPath.boundingBox) {
-                // no possible intersection for this pipe, continue
-                continue
+                // Define cutout triangles (bottomLeft & bottomRight)
+                let inBottomRightCutout =
+                    (localX > topPipeWidth - triangleSize) &&
+                    (localY > topPipeHeight - triangleSize) &&
+                    ((localX - (topPipeWidth - triangleSize)) + (localY - (topPipeHeight - triangleSize)) > triangleSize)
+
+                let inBottomLeftCutout =
+                    (localX < triangleSize2) &&
+                    (localY > topPipeHeight - triangleSize2) &&
+                    (((triangleSize2 - localX) + (localY - (topPipeHeight - triangleSize2))) > triangleSize2)
+
+                // Collide if not inside either cutout
+                if !(inBottomRightCutout || inBottomLeftCutout) {
+                    return true
+                }
             }
 
-            // Sample points in sloth rect (dense grid) and test for containment in either path.
-            if rectIntersectsPath(rect: slothBox, path: topPath, samplesPerSide: sampleGrid) {
-                return true
-            }
-            if rectIntersectsPath(rect: slothBox, path: bottomPath, samplesPerSide: sampleGrid) {
-                return true
-            }
+            // === BOTTOM PIPE ===
+            let bottomPipeX = pipe.x - 19.5
+            let bottomPipeY = UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150
+            let bottomPipeWidth = GameConstants.pipeWidth
+            let bottomPipeHeight = pipe.bottomHeight + 300
 
-            // Additional: also test if any point from the pipe path's bounding box overlaps sloth rect (to catch thin overlap cases).
-            // Sample some points along the path bounding box as well.
-            if rectIntersectsPath(rect: topPath.boundingBox, path: makeRectCGPath(from: slothBox), samplesPerSide: sampleGrid) {
-                return true
-            }
-            if rectIntersectsPath(rect: bottomPath.boundingBox, path: makeRectCGPath(from: slothBox), samplesPerSide: sampleGrid) {
-                return true
+            if abs(slothX - bottomPipeX) < (slothRadius + bottomPipeWidth / 2),
+            abs(slothY - bottomPipeY) < (slothRadius + bottomPipeHeight / 2) {
+
+                let localX = slothX - (bottomPipeX - bottomPipeWidth / 2)
+                let localY = slothY - (bottomPipeY - bottomPipeHeight / 2)
+
+                // Define topRight & topLeft cutouts
+                let inTopRightCutout =
+                    (localX > bottomPipeWidth - triangleSize) &&
+                    (localY < triangleSize) &&
+                    ((localX - (bottomPipeWidth - triangleSize)) + (triangleSize - localY) > triangleSize)
+
+                let inTopLeftCutout =
+                    (localX < triangleSize2) &&
+                    (localY < triangleSize2) &&
+                    (((triangleSize2 - localX) + (triangleSize2 - localY)) > triangleSize2)
+
+                if !(inTopRightCutout || inTopLeftCutout) {
+                    return true
+                }
             }
         }
-        
+
         return false
     }
+
+
     
     private func checkScoreIncrement() {
         let slothX: CGFloat = 100 // Sloth X position
@@ -186,7 +210,6 @@ class GameViewModel: ObservableObject {
             if !pipes[i].passed && pipes[i].x + GameConstants.pipeWidth < slothX {
                 pipes[i].passed = true
                 score += 1
-                print("Score incremented! New score: \(score)")
             }
         }
     }
@@ -228,102 +251,6 @@ class GameViewModel: ObservableObject {
         UserDefaults.standard.set(highScore, forKey: "highScore")
     }
     
-    // MARK: - Precise collision helpers
-
-    private enum CapPosition {
-        case top
-        case bottom
-        case none
-    }
-
-    /// Create a CGPath consisting of a rounded rect (corner radius = width / 4, same as TreePipeShape)
-    /// plus the ellipse cap positioned at the top or bottom. Coordinates are in the same coordinate system
-    /// as your on-screen layout (same as pipe.x / heights).
-    private func makePipeCGPath(forRect rect: CGRect, capPosition: CapPosition) -> CGPath {
-        let path = CGMutablePath()
-
-        // Rounded rect (cornerRadius same as TreePipeShape)
-        let cornerRadius = rect.width / 4.0
-        let roundedRectPath = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
-        path.addPath(roundedRectPath.cgPath)
-
-        // Cap ellipse: width == rect.width, height == GameConstants.pipeCapHeight
-        let capH = GameConstants.pipeCapHeight
-        let capRect: CGRect
-        switch capPosition {
-        case .top:
-            // The PipeTopCap() in the pipe view was .frame(height: 20) and offset(y: -10) for top.
-            // So the ellipse center sits above the topRect by capH/2 (offset -capH/2).
-            capRect = CGRect(x: rect.minX, y: rect.minY - capH, width: rect.width, height: capH)
-            let capPath = UIBezierPath(ovalIn: capRect)
-            path.addPath(capPath.cgPath)
-        case .bottom:
-            // For bottom cap overlay offset there was .offset(y: 10) (so bubble sits below the bottom rect)
-            capRect = CGRect(x: rect.minX, y: rect.maxY, width: rect.width, height: capH)
-            let capPath = UIBezierPath(ovalIn: capRect)
-            path.addPath(capPath.cgPath)
-        case .none:
-            // No cap - just the rounded rectangle
-            break
-        }
-
-        return path
-    }
-
-    /// Build a rectangle CGPath (useful if you want to test path vs rect)
-    private func makeRectCGPath(from rect: CGRect) -> CGPath {
-        let p = CGMutablePath()
-        p.addRect(rect)
-        return p
-    }
-
-    /// Return true if any sample point inside `rect` is contained in `path`.
-    /// We sample a grid across the rect to catch intersections even if edges just graze.
-    private func rectIntersectsPath(rect: CGRect, path: CGPath, samplesPerSide: Int) -> Bool {
-        if samplesPerSide <= 0 { return false }
-
-        // Quick reject using bounding boxes
-        if !rect.intersects(path.boundingBox) {
-            return false
-        }
-
-        // Sample a grid of points inside rect (inclusive of edges)
-        for row in 0..<samplesPerSide {
-            for col in 0..<samplesPerSide {
-                let fx = CGFloat(col) / CGFloat(max(1, samplesPerSide - 1)) // 0..1
-                let fy = CGFloat(row) / CGFloat(max(1, samplesPerSide - 1)) // 0..1
-                let px = rect.minX + fx * rect.width
-                let py = rect.minY + fy * rect.height
-                if path.contains(CGPoint(x: px, y: py)) {
-                    return true
-                }
-            }
-        }
-
-        // Also sample the perimeter points (helps catch thin touches)
-        let perimeterSamples = max(12, samplesPerSide * 4)
-        for i in 0..<perimeterSamples {
-            let t = CGFloat(i) / CGFloat(perimeterSamples)
-            // walk rectangle perimeter: top, right, bottom, left
-            var point = CGPoint.zero
-            let segment = Int(t * 4.0)
-            let localT = (t * 4.0) - CGFloat(segment)
-            switch segment {
-            case 0: // top
-                point = CGPoint(x: rect.minX + localT * rect.width, y: rect.minY)
-            case 1: // right
-                point = CGPoint(x: rect.maxX, y: rect.minY + localT * rect.height)
-            case 2: // bottom
-                point = CGPoint(x: rect.maxX - localT * rect.width, y: rect.maxY)
-            default: // left
-                point = CGPoint(x: rect.minX, y: rect.maxY - localT * rect.height)
-            }
-            if path.contains(point) { return true }
-        }
-
-        return false
-    }
-
     // MARK: - Cleanup
     deinit {
         // Timer will be automatically invalidated when the view model is deallocated
