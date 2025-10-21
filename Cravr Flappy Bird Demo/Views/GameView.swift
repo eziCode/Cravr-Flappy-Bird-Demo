@@ -57,6 +57,13 @@ struct PipeView: View {
                     .scaleEffect(x: 1, y: -1) // Only reflection, no width scaling
                     .offset(x: -19.5, y: -150) // Use off-screen content for gap
                     .position(x: pipe.x, y: pipe.topHeight / 2)
+                
+                Rectangle()
+                    .fill(Color.red.opacity(0.5))
+                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300)
+                    .scaleEffect(x: 1, y: -1)
+                    .offset(x: -19.5, y: -150)
+                    .position(x: pipe.x, y: pipe.topHeight / 2)
             }
             
             // Bottom pipe - extended beyond screen
@@ -67,6 +74,13 @@ struct PipeView: View {
                     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
                     .scaleEffect(x: 0.6, y: 1) // No scaling
                     .offset(x: -19.5, y: 150) // Use off-screen content for gap
+                    .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
+                
+                Rectangle()
+                    .fill(Color.red.opacity(0.5))
+                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300)
+                    .scaleEffect(x: 1, y: 1)
+                    .offset(x: -19.5, y: 150)
                     .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
             }
         }
