@@ -54,10 +54,9 @@ struct PipeView: View {
                     .resizable()
                     .scaledToFit()
                     .rotationEffect(.degrees(90))
-                    .offset(x: -7)
+                    .offset(x: -8)
+                    .position(x: pipe.x, y: 0)
             }
-            
-            Spacer().frame(height: GameConstants.pipeSpacing)
             
             // Bottom pipe
             ZStack {
@@ -65,6 +64,7 @@ struct PipeView: View {
                     .resizable()
                     .scaledToFit()
                     .rotationEffect(.degrees(270))
+                    .position(x: pipe.x, y: UIScreen.main.bounds.height - 500)
             }
         }
     }

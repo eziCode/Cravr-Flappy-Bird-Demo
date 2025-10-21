@@ -115,6 +115,18 @@ class GameViewModel: ObservableObject {
     
     private func updatePipes() {
         // TODO: implement
+        for i in 0..<pipes.count {
+            pipes[i].x -= pipeSpeed
+        }
+
+        pipes.removeAll { $0.x + GameConstants.pipeWidth < 0 }
+
+        if let lastPipe = pipes.last {
+            if lastPipe.x < GameConstants.screenWidth - 200 {
+                let topHeight = CGFloat.random(in: GameConstants.easyPipeHeightRange)
+                pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
+            }
+        }
     }
     
     private func checkCollisions() -> Bool {
