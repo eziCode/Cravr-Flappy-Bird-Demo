@@ -18,6 +18,12 @@ struct GameView: View {
                 .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
                 .position(x: 100, y: viewModel.sloth.y + GameConstants.screenCenter)
             
+            // Sloth collision bounding box
+            Circle()
+                .fill(Color.red.opacity(0.3))
+                .frame(width: 40, height: 40) // 20 radius * 2 = 40 diameter
+                .position(x: 100, y: viewModel.sloth.y + GameConstants.screenCenter)
+            
             // Enhanced Pipes
             ForEach(viewModel.pipes) { pipe in
                 PipeView(pipe: pipe)
@@ -58,10 +64,9 @@ struct PipeView: View {
                     .offset(x: -19.5, y: -150) // Use off-screen content for gap
                     .position(x: pipe.x, y: pipe.topHeight / 2)
                 
-                // Red debug box for top pipe (outline around the actual pipe)
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
-                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width with border
+                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
                     .offset(x: -19.5, y: -150) // Use off-screen content for gap
                     .position(x: pipe.x, y: pipe.topHeight / 2)
             }
@@ -76,11 +81,10 @@ struct PipeView: View {
                     .offset(x: -19.5, y: 150) // Use off-screen content for gap
                     .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
                 
-                // Red debug box for bottom pipe (outline around the actual pipe)
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
-                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width with border
-                    .offset(x: -19.5, y: 150)
+                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                    .offset(x: -19.5, y: 150) // Use off-screen content for gap
                     .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
             }
         }

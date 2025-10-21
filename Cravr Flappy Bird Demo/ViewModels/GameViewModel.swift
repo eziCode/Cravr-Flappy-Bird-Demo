@@ -111,6 +111,9 @@ class GameViewModel: ObservableObject {
             resetGame()
             return
         }
+        
+        // Check for score increments
+        checkScoreIncrement()
     }
     
     private func updatePipes() {
@@ -130,8 +133,52 @@ class GameViewModel: ObservableObject {
     }
     
     private func checkCollisions() -> Bool {
-        // TODO: implement
+        let slothX: CGFloat = 100 // Sloth X position from GameView
+        let slothY: CGFloat = sloth.y + GameConstants.screenCenter // Sloth Y position
+        let slothRadius: CGFloat = 20 // Approximate sloth collision radius
+        
+        for pipe in pipes {
+            // Top pipe collision - match the red box exactly
+            let topPipeX = pipe.x - 19.5 // Match the offset from red box
+            let topPipeY = pipe.topHeight / 2 - 150 // Match the offset from red box
+            let topPipeWidth = GameConstants.pipeWidth
+            let topPipeHeight = pipe.topHeight + 300
+            
+            // Bottom pipe collision - match the red box exactly
+            let bottomPipeX = pipe.x - 19.5 // Match the offset from red box
+            let bottomPipeY = UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150 // Match the offset from red box
+            let bottomPipeWidth = GameConstants.pipeWidth
+            let bottomPipeHeight = pipe.bottomHeight + 300
+            
+            // Check collision with top pipe
+            if abs(slothX - topPipeX) < (slothRadius + topPipeWidth/2) &&
+               abs(slothY - topPipeY) < (slothRadius + topPipeHeight/2) {
+                print("Game over - top pipe collision! slothY: \(slothY), pipeY: \(topPipeY)")
+                return true
+            }
+            
+            // Check collision with bottom pipe
+            if abs(slothX - bottomPipeX) < (slothRadius + bottomPipeWidth/2) &&
+               abs(slothY - bottomPipeY) < (slothRadius + bottomPipeHeight/2) {
+                print("Game over - bottom pipe collision! slothY: \(slothY), pipeY: \(bottomPipeY)")
+                return true
+            }
+        }
+        
         return false
+    }
+    
+    private func checkScoreIncrement() {
+        let slothX: CGFloat = 100 // Sloth X position
+        
+        for i in 0..<pipes.count {
+            // Check if sloth has passed through this pipe
+            if !pipes[i].passed && pipes[i].x + GameConstants.pipeWidth < slothX {
+                pipes[i].passed = true
+                score += 1
+                print("Score incremented! New score: \(score)")
+            }
+        }
     }
     
     private func checkBoundaryCollisions() -> Bool {
