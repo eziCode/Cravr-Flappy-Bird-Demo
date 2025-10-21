@@ -50,60 +50,22 @@ struct PipeView: View {
         VStack(spacing: 0) {
             // Top pipe
             ZStack {
-                Rectangle()
-                    .frame(width: GameConstants.pipeWidth + 4, height: pipe.topHeight + 4)
-                    .foregroundColor(.black.opacity(0.3))
-                    .offset(x: 2, y: 2)
-                
-                Rectangle()
-                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight)
-                    .foregroundStyle(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(hex: "1cd91f"), // SGBus Green
-                                Color(hex: "0d4f0d")  // Darker green for depth
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .overlay(
-                        Rectangle()
-                            .frame(width: GameConstants.pipeWidth - 8, height: 8)
-                            .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue accent
-                            .offset(y: pipe.topHeight/2 - 4)
-                    )
+                Image("tree-trunk-pipe-image")
+                    .resizable()
+                    .scaledToFit()
+                    .rotationEffect(.degrees(90))
+                    .offset(x: -7)
             }
             
             Spacer().frame(height: GameConstants.pipeSpacing)
             
             // Bottom pipe
             ZStack {
-                Rectangle()
-                    .frame(width: GameConstants.pipeWidth + 4, height: pipe.bottomHeight + 4)
-                    .foregroundColor(.black.opacity(0.3))
-                    .offset(x: 2, y: -2)
-                
-                Rectangle()
-                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight)
-                    .foregroundStyle(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(hex: "0d4f0d"), // Darker green for depth
-                                Color(hex: "1cd91f")  // SGBus Green
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .overlay(
-                        Rectangle()
-                            .frame(width: GameConstants.pipeWidth - 8, height: 8)
-                            .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue accent
-                            .offset(y: -pipe.bottomHeight/2 + 4)
-                    )
+                Image("tree-trunk-pipe-image")
+                    .resizable()
+                    .scaledToFit()
+                    .rotationEffect(.degrees(270))
             }
         }
-        .position(x: pipe.x, y: GameConstants.screenCenter)
     }
 }

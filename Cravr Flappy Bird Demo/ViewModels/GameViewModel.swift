@@ -114,60 +114,11 @@ class GameViewModel: ObservableObject {
     }
     
     private func updatePipes() {
-        // Move pipes
-        for i in pipes.indices {
-            pipes[i].x -= pipeSpeed
-            
-            // Check for scoring
-            if pipes[i].x + GameConstants.pipeWidth/2 < 100 - 15 && !pipes[i].passed {
-                score += 1
-                pipes[i].passed = true
-                playScoringSound()
-                haptics.impact(.light)
-            }
-        }
-        
-        // Remove offscreen pipes
-        pipes.removeAll { $0.x < GameConstants.pipeRemovalThreshold }
-        
-        // Add new pipe if needed
-        if pipes.last?.x ?? 0 < GameConstants.screenWidth - GameConstants.pipeGenerationDistance {
-            let topHeight = generatePipeHeight()
-            pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
-        }
-    }
-    
-    private func generatePipeHeight() -> CGFloat {
-        if score < GameConstants.difficultyIncreaseThreshold {
-            return CGFloat.random(in: GameConstants.easyPipeHeightRange)
-        } else {
-            let difficulty = min((score - GameConstants.difficultyIncreaseThreshold) / 5, GameConstants.maxDifficultyLevel)
-            let minHeight = 100 + CGFloat(difficulty) * 20
-            let maxHeight = 300 - CGFloat(difficulty) * 20
-            return CGFloat.random(in: minHeight...maxHeight)
-        }
+        // TODO: implement
     }
     
     private func checkCollisions() -> Bool {
-        for pipe in pipes {
-            let topRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth/2,
-                y: 0,
-                width: GameConstants.pipeWidth,
-                height: pipe.topHeight
-            )
-            let bottomRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth/2,
-                y: pipe.topHeight + GameConstants.pipeSpacing,
-                width: GameConstants.pipeWidth,
-                height: GameConstants.screenHeight - pipe.topHeight - GameConstants.pipeSpacing
-            )
-            
-            if sloth.frame.intersects(topRect) || sloth.frame.intersects(bottomRect) {
-                print("Game over - pipe collision!")
-                return true
-            }
-        }
+        // TODO: implement
         return false
     }
     
