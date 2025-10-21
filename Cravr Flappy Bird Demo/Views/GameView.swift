@@ -52,17 +52,17 @@ struct PipeView: View {
             ZStack {
                 Image("tree-trunk-pipe-image")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: GameConstants.pipeWidth + 40, height: pipe.topHeight + 300) // Much longer pipe
-                    .scaleEffect(x: 0.6, y: -1) // Skinnier and reflected
-                    .offset(x: -19.5, y: -150) // Adjusted offset for reflection
+                    .scaledToFill()
+                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
+                    .scaleEffect(x: 1, y: -1) // Only reflection, no width scaling
+                    .offset(x: -19.5, y: -150) // Use off-screen content for gap
                     .position(x: pipe.x, y: pipe.topHeight / 2)
                 
                 // Red debug box for top pipe (outline around the actual pipe)
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
-                    .frame(width: (GameConstants.pipeWidth + 40) * 0.6 + 4, height: pipe.topHeight + 300 + 4) // Scaled to match skinnier pipe
-                    .offset(x: -19.5, y: -150) // Adjusted offset to match reflection
+                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width with border
+                    .offset(x: -19.5, y: -150) // Use off-screen content for gap
                     .position(x: pipe.x, y: pipe.topHeight / 2)
             }
             
@@ -70,16 +70,16 @@ struct PipeView: View {
             ZStack {
                 Image("tree-trunk-pipe-image")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: GameConstants.pipeWidth + 40, height: pipe.bottomHeight + 300) // Much longer pipe
-                    .scaleEffect(x: 0.6, y: 1) // Skinnier
-                    .offset(x: -19.5, y: 150) // Offset down to show pipe extending below screen
+                    .scaledToFill()
+                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                    .scaleEffect(x: 0.6, y: 1) // No scaling
+                    .offset(x: -19.5, y: 150) // Use off-screen content for gap
                     .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
                 
                 // Red debug box for bottom pipe (outline around the actual pipe)
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
-                    .frame(width: (GameConstants.pipeWidth + 40) * 0.6 + 4, height: pipe.bottomHeight + 300 + 4) // Scaled to match skinnier pipe
+                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width with border
                     .offset(x: -19.5, y: 150)
                     .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
             }
