@@ -131,6 +131,12 @@ class GameViewModel: ObservableObject {
         let slothX: CGFloat = GameConstants.screenWidth * 0.25 // 25% from left
         let slothY: CGFloat = sloth.y + GameConstants.screenCenter
         let slothRadius: CGFloat = GameConstants.screenWidth * 0.05 // 5% of screen width
+        
+        // Calculate sloth's top and bottom edges
+        let slothTop = slothY - slothRadius
+        let slothBottom = slothY + slothRadius
+        let isMovingUpward = sloth.velocity < 0
+        let isMovingDownward = sloth.velocity > 0
 
         // These match the TriangleCutRectangle sizes
         let triangleSize: CGFloat = GameConstants.screenWidth * 0.1   // 10% of screen width for right corners
@@ -164,6 +170,11 @@ class GameViewModel: ObservableObject {
 
                 // Collide if not inside either cutout
                 if !(inBottomRightCutout || inBottomLeftCutout) {
+                    // Check if sloth is moving upward and its top edge crosses into the pipe
+                    if isMovingUpward && slothTop <= (topPipeY + topPipeHeight / 2) {
+                        return true
+                    }
+                    // For other cases, use the original collision logic
                     return true
                 }
             }
@@ -192,6 +203,11 @@ class GameViewModel: ObservableObject {
                     (((triangleSize2 - localX) + (triangleSize2 - localY)) > triangleSize2)
 
                 if !(inTopRightCutout || inTopLeftCutout) {
+                    // Check if sloth is moving downward and its bottom edge crosses into the pipe
+                    if isMovingDownward && slothBottom >= (bottomPipeY - bottomPipeHeight / 2) {
+                        return true
+                    }
+                    // For other cases, use the original collision logic
                     return true
                 }
             }
