@@ -52,17 +52,16 @@ struct PipeView: View {
             ZStack {
                 Image("tree-trunk-pipe-image")
                     .resizable()
-                    .scaledToFill()
+                    .aspectRatio(contentMode: .fit)
                     .frame(width: GameConstants.pipeWidth + 40, height: pipe.topHeight + 300) // Much longer pipe
-                    .clipped()
-                    .scaleEffect(x: 1, y: -1) // Reflection instead of rotation
+                    .scaleEffect(x: 0.6, y: -1) // Skinnier and reflected
                     .offset(x: -19.5, y: -150) // Adjusted offset for reflection
                     .position(x: pipe.x, y: pipe.topHeight / 2)
                 
                 // Red debug box for top pipe (outline around the actual pipe)
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
-                    .frame(width: GameConstants.pipeWidth + 40, height: pipe.topHeight + 300 + 4) // Much wider to outline without constraining
+                    .frame(width: (GameConstants.pipeWidth + 40) * 0.6 + 4, height: pipe.topHeight + 300 + 4) // Scaled to match skinnier pipe
                     .offset(x: -19.5, y: -150) // Adjusted offset to match reflection
                     .position(x: pipe.x, y: pipe.topHeight / 2)
             }
@@ -71,17 +70,16 @@ struct PipeView: View {
             ZStack {
                 Image("tree-trunk-pipe-image")
                     .resizable()
-                    .scaledToFill()
+                    .aspectRatio(contentMode: .fit)
                     .frame(width: GameConstants.pipeWidth + 40, height: pipe.bottomHeight + 300) // Much longer pipe
-                    .clipped()
-                    .rotationEffect(.degrees(0))
+                    .scaleEffect(x: 0.6, y: 1) // Skinnier
                     .offset(x: -19.5, y: 150) // Offset down to show pipe extending below screen
                     .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
                 
                 // Red debug box for bottom pipe (outline around the actual pipe)
                 Rectangle()
                     .fill(Color.red.opacity(0.3))
-                    .frame(width: GameConstants.pipeWidth + 40, height: pipe.bottomHeight + 300 + 4) // Much wider to outline without constraining
+                    .frame(width: (GameConstants.pipeWidth + 40) * 0.6 + 4, height: pipe.bottomHeight + 300 + 4) // Scaled to match skinnier pipe
                     .offset(x: -19.5, y: 150)
                     .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
             }
