@@ -105,40 +105,24 @@ class GameViewModel: ObservableObject {
             resetGame()
             return
         }
+        
+        // Check for score increments
+        checkScoreIncrement()
     }
     
     private func updatePipes() {
-        // Move pipes
-        for i in pipes.indices {
+        // TODO: implement
+        for i in 0..<pipes.count {
             pipes[i].x -= pipeSpeed
-            
-            // Check for scoring
-            if pipes[i].x + GameConstants.pipeWidth/2 < 100 - 15 && !pipes[i].passed {
-                score += 1
-                pipes[i].passed = true
-                playScoringSound()
-                haptics.impact(.light)
+        }
+
+        pipes.removeAll { $0.x + GameConstants.pipeWidth < 0 }
+
+        if let lastPipe = pipes.last {
+            if lastPipe.x < GameConstants.screenWidth - 200 {
+                let topHeight = CGFloat.random(in: GameConstants.easyPipeHeightRange)
+                pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
             }
-        }
-        
-        // Remove offscreen pipes
-        pipes.removeAll { $0.x < GameConstants.pipeRemovalThreshold }
-        
-        // Add new pipe if needed
-        if pipes.last?.x ?? 0 < GameConstants.screenWidth - GameConstants.pipeGenerationDistance {
-            let topHeight = generatePipeHeight()
-            pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
-        }
-    }
-    
-    private func generatePipeHeight() -> CGFloat {
-        if score < GameConstants.difficultyIncreaseThreshold {
-            return CGFloat.random(in: GameConstants.easyPipeHeightRange)
-        } else {
-            let difficulty = min((score - GameConstants.difficultyIncreaseThreshold) / 5, GameConstants.maxDifficultyLevel)
-            let minHeight = 100 + CGFloat(difficulty) * 20
-            let maxHeight = 300 - CGFloat(difficulty) * 20
-            return CGFloat.random(in: minHeight...maxHeight)
         }
     }
     
@@ -190,7 +174,21 @@ class GameViewModel: ObservableObject {
                 return true
             }
         }
+        
         return false
+    }
+    
+    private func checkScoreIncrement() {
+        let slothX: CGFloat = 100 // Sloth X position
+        
+        for i in 0..<pipes.count {
+            // Check if sloth has passed through this pipe
+            if !pipes[i].passed && pipes[i].x + GameConstants.pipeWidth < slothX {
+                pipes[i].passed = true
+                score += 1
+                print("Score incremented! New score: \(score)")
+            }
+        }
     }
     
     private func checkBoundaryCollisions() -> Bool {

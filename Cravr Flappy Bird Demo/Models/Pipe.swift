@@ -13,7 +13,7 @@ struct Pipe: Identifiable {
     var x: CGFloat
     var topHeight: CGFloat
     var bottomHeight: CGFloat {
-        UIScreen.main.bounds.height - topHeight - 150
+        UIScreen.main.bounds.height - topHeight - GameConstants.pipeSpacing
     }
     var passed = false
 }
