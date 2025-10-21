@@ -52,18 +52,14 @@ struct PipeView: View {
             ZStack {
                 Image("tree-trunk-pipe-image")
                     .resizable()
-                    .scaledToFill()
                     .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
                     .scaleEffect(x: 1, y: -1) // Only reflection, no width scaling
-                    .offset(x: -19.5, y: -150) // Use off-screen content for gap
-                    .position(x: pipe.x, y: pipe.topHeight / 2)
+                    .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
                 
                 Rectangle()
-                    .fill(Color.red.opacity(0.5))
-                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300)
-                    .scaleEffect(x: 1, y: -1)
-                    .offset(x: -19.5, y: -150)
-                    .position(x: pipe.x, y: pipe.topHeight / 2)
+                    .fill(Color.red.opacity(0.3))
+                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
+                    .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
             }
             
             // Bottom pipe - extended beyond screen
@@ -73,15 +69,12 @@ struct PipeView: View {
                     .scaledToFill()
                     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
                     .scaleEffect(x: 0.6, y: 1) // No scaling
-                    .offset(x: -19.5, y: 150) // Use off-screen content for gap
-                    .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
+                    .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
                 
                 Rectangle()
-                    .fill(Color.red.opacity(0.5))
-                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300)
-                    .scaleEffect(x: 1, y: 1)
-                    .offset(x: -19.5, y: 150)
-                    .position(x: pipe.x, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2))
+                    .fill(Color.red.opacity(0.3))
+                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                    .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
             }
         }
     }
