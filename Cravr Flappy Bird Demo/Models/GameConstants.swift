@@ -11,7 +11,7 @@ import UIKit
 struct GameConstants {
     static let gravity: CGFloat = 0.55
     static let jump: CGFloat = -9
-    static let pipeWidth: CGFloat = 50
+    static let pipeWidth: CGFloat = 80
     static let pipeSpacing: CGFloat = 180
     static let basePipeSpeed: CGFloat = 4
     static let gameTimerInterval: Double = 0.016 // ~60 FPS
