@@ -119,7 +119,7 @@ class GameViewModel: ObservableObject {
             pipes[i].x -= pipeSpeed
             
             // Check for scoring
-            if pipes[i].x + GameConstants.pipeWidth/2 < 100 - 15 && !pipes[i].passed {
+            if pipes[i].x + GameConstants.treeTrunkWidth/2 < 100 - 15 && !pipes[i].passed {
                 score += 1
                 pipes[i].passed = true
                 playScoringSound()
@@ -133,7 +133,7 @@ class GameViewModel: ObservableObject {
         // Add new pipe if needed
         if pipes.last?.x ?? 0 < GameConstants.screenWidth - GameConstants.pipeGenerationDistance {
             let topHeight = generatePipeHeight()
-            pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
+            pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.treeTrunkWidth, topHeight: topHeight))
         }
     }
     
@@ -151,16 +151,16 @@ class GameViewModel: ObservableObject {
     private func checkCollisions() -> Bool {
         for pipe in pipes {
             let topRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth/2,
+                x: pipe.x - GameConstants.treeTrunkWidth/2,
                 y: 0,
-                width: GameConstants.pipeWidth,
+                width: GameConstants.treeTrunkWidth,
                 height: pipe.topHeight
             )
             let bottomRect = CGRect(
-                x: pipe.x - GameConstants.pipeWidth/2,
+                x: pipe.x - GameConstants.treeTrunkWidth/2,
                 y: pipe.topHeight + GameConstants.pipeSpacing,
-                width: GameConstants.pipeWidth,
-                height: GameConstants.screenHeight - pipe.topHeight - GameConstants.pipeSpacing
+                width: GameConstants.treeTrunkWidth,
+                height: pipe.bottomHeight
             )
             
             if sloth.frame.intersects(topRect) || sloth.frame.intersects(bottomRect) {

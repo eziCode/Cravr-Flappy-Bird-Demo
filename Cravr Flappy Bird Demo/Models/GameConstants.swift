@@ -12,7 +12,8 @@ struct GameConstants {
     static let gravity: CGFloat = 0.55
     static let jump: CGFloat = -9
     static let pipeWidth: CGFloat = 50
-    static let pipeSpacing: CGFloat = 180
+    static let treeTrunkWidth: CGFloat = 80  // Actual width when tree trunk image is scaled by height
+    static let pipeSpacing: CGFloat = 160
     static let basePipeSpeed: CGFloat = 4
     static let gameTimerInterval: Double = 0.016 // ~60 FPS
     
@@ -22,9 +23,9 @@ struct GameConstants {
     static let maxDifficultyLevel = 4
     
     // Pipe generation
-    static let easyPipeHeightRange: ClosedRange<CGFloat> = 120...280
+    static let easyPipeHeightRange: ClosedRange<CGFloat> = 100...250
     static let pipeGenerationDistance: CGFloat = 200
-    static let pipeRemovalThreshold: CGFloat = -50
+    static let pipeRemovalThreshold: CGFloat = -100
     
     // Screen bounds
     static var screenHeight: CGFloat { UIScreen.main.bounds.height }
