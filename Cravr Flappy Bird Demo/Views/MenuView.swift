@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MenuView: View {
     @ObservedObject var viewModel: GameViewModel
+    @State private var logoPulseScale: CGFloat = 0.95
     
     var body: some View {
         VStack(spacing: 30) {
@@ -20,11 +21,16 @@ struct MenuView: View {
                 PixelTitle()
                     .scaleEffect(viewModel.hasPlayedOnce ? 1.0 : 1.1)
                     .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: viewModel.hasPlayedOnce)
+                    .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
+                    .scaleEffect(logoPulseScale) // Pulsing scale animation
+                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: logoPulseScale)
+                    .onAppear {
+                        logoPulseScale = 1.05
+                    }
                 
                 // Sloth Logo
                 SlothIcon(size: GameConstants.screenWidth * 0.25) // 25% of screen width
                     .scaleEffect(viewModel.sloth.scale)
-                    .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
             }
             
             // High Score Display
