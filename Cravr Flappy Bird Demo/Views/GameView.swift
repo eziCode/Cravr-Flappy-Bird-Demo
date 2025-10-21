@@ -13,10 +13,10 @@ struct GameView: View {
     var body: some View {
         ZStack {
             // Sloth with enhanced styling
-            SlothIcon(size: 40)
+            SlothIcon(size: GameConstants.screenWidth * 0.1) // 10% of screen width
                 .scaleEffect(viewModel.sloth.scale)
                 .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
-                .position(x: 100, y: viewModel.sloth.y + GameConstants.screenCenter)
+                .position(x: GameConstants.screenWidth * 0.25, y: viewModel.sloth.y + GameConstants.screenCenter) // 25% from left
             
             // Enhanced Pipes
             ForEach(viewModel.pipes) { pipe in
@@ -27,17 +27,17 @@ struct GameView: View {
             if viewModel.gameState == .playing {
                 ZStack {
                     // Score background
-                    RoundedRectangle(cornerRadius: 15)
-                        .frame(width: 200, height: 60)
+                    RoundedRectangle(cornerRadius: GameConstants.screenWidth * 0.0375) // 3.75% of screen width
+                        .frame(width: GameConstants.screenWidth * 0.5, height: GameConstants.screenHeight * 0.08) // 50% width, 8% height
                         .foregroundColor(.black.opacity(0.6))
                         .blur(radius: 1)
                     
                     Text("Score: \(viewModel.score)")
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .font(.system(size: GameConstants.screenWidth * 0.06, weight: .bold, design: .rounded)) // 6% of screen width
                         .foregroundColor(Color(hex: "f7ec59")) // Maize
                         .shadow(color: .black, radius: 2, x: 1, y: 1)
                 }
-                .position(x: GameConstants.screenWidth / 2, y: 60)
+                .position(x: GameConstants.screenWidth / 2, y: GameConstants.screenHeight * 0.08) // 8% from top
             }
         }
     }
@@ -52,9 +52,9 @@ struct PipeView: View {
             ZStack {
                 Image("tree-trunk-pipe-image")
                     .resizable()
-                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
+                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + GameConstants.screenHeight * 0.375) // Consistent width, variable height
                     .scaleEffect(x: 1, y: -1) // Only reflection, no width scaling
-                    .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
+                    .position(x: pipe.x - GameConstants.screenWidth * 0.04875, y: pipe.topHeight / 2 - GameConstants.screenHeight * 0.1875) // Match collision detection positioning
                 
                 // Rectangle()
                 //     .fill(Color.red.opacity(0.3))
@@ -68,9 +68,9 @@ struct PipeView: View {
                 Image("tree-trunk-pipe-image")
                     .resizable()
                     .scaledToFill()
-                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
+                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + GameConstants.screenHeight * 0.375) // Consistent width, variable height
                     .scaleEffect(x: 0.6, y: 1) // No scaling
-                    .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
+                    .position(x: pipe.x - GameConstants.screenWidth * 0.04875, y: GameConstants.screenHeight - (pipe.bottomHeight / 2) + GameConstants.screenHeight * 0.1875) // Match collision detection positioning
                 
                 // Rectangle()
                 //     .fill(Color.red.opacity(0.3))

@@ -36,7 +36,7 @@ struct PixelTitle: View {
                     PixelLetter(
                         char: char,
                         color: flappyColors[index % flappyColors.count],
-                        size: 44
+                        size: GameConstants.screenWidth * 0.11 // 11% of screen width
                     )
                 }
             }
@@ -47,12 +47,12 @@ struct PixelTitle: View {
                     PixelLetter(
                         char: char,
                         color: slothColors[index % slothColors.count],
-                        size: 44
+                        size: GameConstants.screenWidth * 0.11 // 11% of screen width
                     )
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, GameConstants.screenWidth * 0.05) // 5% of screen width
     }
 }
 

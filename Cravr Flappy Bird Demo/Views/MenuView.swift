@@ -22,7 +22,7 @@ struct MenuView: View {
                     .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: viewModel.hasPlayedOnce)
                 
                 // Sloth Logo
-                SlothIcon(size: 100)
+                SlothIcon(size: GameConstants.screenWidth * 0.25) // 25% of screen width
                     .scaleEffect(viewModel.sloth.scale)
                     .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
             }
@@ -30,19 +30,19 @@ struct MenuView: View {
             // High Score Display
             VStack(spacing: 10) {
                 Text("HIGH SCORE")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .font(.system(size: GameConstants.screenWidth * 0.045, weight: .semibold, design: .rounded)) // 4.5% of screen width
                     .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
                     .shadow(color: .black, radius: 2, x: 1, y: 1)
                 
                 ZStack {
                     // Score background
-                    RoundedRectangle(cornerRadius: 12)
-                        .frame(width: 120, height: 50)
+                    RoundedRectangle(cornerRadius: GameConstants.screenWidth * 0.03) // 3% of screen width
+                        .frame(width: GameConstants.screenWidth * 0.3, height: GameConstants.screenHeight * 0.065) // 30% width, 6.5% height
                         .foregroundColor(.black.opacity(0.6))
                         .blur(radius: 1)
                     
                     Text("\(viewModel.highScore)")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(size: GameConstants.screenWidth * 0.07, weight: .bold, design: .rounded)) // 7% of screen width
                         .foregroundColor(Color(hex: "f7ec59")) // Maize
                         .shadow(color: .black, radius: 2, x: 1, y: 1)
                 }
@@ -57,13 +57,13 @@ struct MenuView: View {
                     viewModel.startGame()
                 }) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 15)
-                            .frame(width: 200, height: 60)
+                        RoundedRectangle(cornerRadius: GameConstants.screenWidth * 0.0375) // 3.75% of screen width
+                            .frame(width: GameConstants.screenWidth * 0.5, height: GameConstants.screenHeight * 0.08) // 50% width, 8% height
                             .foregroundColor(Color(hex: "1cd91f")) // SGBus Green
                             .shadow(color: .black.opacity(0.3), radius: 3, x: 2, y: 2)
                         
                         Text("PLAY")
-                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .font(.system(size: GameConstants.screenWidth * 0.06, weight: .bold, design: .rounded)) // 6% of screen width
                             .foregroundColor(.white)
                             .shadow(color: .black, radius: 2, x: 1, y: 1)
                     }
@@ -76,13 +76,13 @@ struct MenuView: View {
                     // TODO: Implement back button functionality to dismiss to rest of app
                 }) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .frame(width: 160, height: 50)
+                        RoundedRectangle(cornerRadius: GameConstants.screenWidth * 0.03) // 3% of screen width
+                            .frame(width: GameConstants.screenWidth * 0.4, height: GameConstants.screenHeight * 0.065) // 40% width, 6.5% height
                             .foregroundColor(Color(hex: "fa7921")) // Pumpkin
                             .shadow(color: .black.opacity(0.3), radius: 2, x: 1, y: 1)
                         
                         Text("BACK")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .font(.system(size: GameConstants.screenWidth * 0.045, weight: .semibold, design: .rounded)) // 4.5% of screen width
                             .foregroundColor(.white)
                             .shadow(color: .black, radius: 1, x: 1, y: 1)
                     }

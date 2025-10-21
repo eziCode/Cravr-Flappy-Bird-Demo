@@ -44,7 +44,7 @@ class GameViewModel: ObservableObject {
         gameState = .playing
         sloth.reset()
         score = 0
-        pipes = [Pipe(x: GameConstants.screenWidth + 100, topHeight: CGFloat.random(in: GameConstants.easyPipeHeightRange))]
+        pipes = [Pipe(x: GameConstants.screenWidth + GameConstants.screenWidth * 0.25, topHeight: CGFloat.random(in: GameConstants.easyPipeHeightRange))]
         hasPlayedOnce = true
         startGameTimer()
     }
@@ -120,7 +120,7 @@ class GameViewModel: ObservableObject {
         pipes.removeAll { $0.x + GameConstants.pipeWidth < 0 }
 
         if let lastPipe = pipes.last {
-            if lastPipe.x < GameConstants.screenWidth - 200 {
+            if lastPipe.x < GameConstants.screenWidth - GameConstants.screenWidth * 0.5 {
                 let topHeight = CGFloat.random(in: GameConstants.easyPipeHeightRange)
                 pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
             }
@@ -128,20 +128,20 @@ class GameViewModel: ObservableObject {
     }
     
     private func checkCollisions() -> Bool {
-        let slothX: CGFloat = 100
+        let slothX: CGFloat = GameConstants.screenWidth * 0.25 // 25% from left
         let slothY: CGFloat = sloth.y + GameConstants.screenCenter
-        let slothRadius: CGFloat = 20
+        let slothRadius: CGFloat = GameConstants.screenWidth * 0.05 // 5% of screen width
 
         // These match the TriangleCutRectangle sizes
-        let triangleSize: CGFloat = 40   // For right corners
-        let triangleSize2: CGFloat = 20  // For left corners
+        let triangleSize: CGFloat = GameConstants.screenWidth * 0.1   // 10% of screen width for right corners
+        let triangleSize2: CGFloat = GameConstants.screenWidth * 0.05  // 5% of screen width for left corners
 
         for pipe in pipes {
             // === TOP PIPE ===
-            let topPipeX = pipe.x - 19.5
-            let topPipeY = pipe.topHeight / 2 - 150
+            let topPipeX = pipe.x - GameConstants.screenWidth * 0.04875
+            let topPipeY = pipe.topHeight / 2 - GameConstants.screenHeight * 0.1875
             let topPipeWidth = GameConstants.pipeWidth
-            let topPipeHeight = pipe.topHeight + 300
+            let topPipeHeight = pipe.topHeight + GameConstants.screenHeight * 0.375
 
             // Fast bounding-box rejection
             if abs(slothX - topPipeX) < (slothRadius + topPipeWidth / 2),
@@ -169,10 +169,10 @@ class GameViewModel: ObservableObject {
             }
 
             // === BOTTOM PIPE ===
-            let bottomPipeX = pipe.x - 19.5
-            let bottomPipeY = UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150
+            let bottomPipeX = pipe.x - GameConstants.screenWidth * 0.04875
+            let bottomPipeY = GameConstants.screenHeight - (pipe.bottomHeight / 2) + GameConstants.screenHeight * 0.1875
             let bottomPipeWidth = GameConstants.pipeWidth
-            let bottomPipeHeight = pipe.bottomHeight + 300
+            let bottomPipeHeight = pipe.bottomHeight + GameConstants.screenHeight * 0.375
 
             if abs(slothX - bottomPipeX) < (slothRadius + bottomPipeWidth / 2),
             abs(slothY - bottomPipeY) < (slothRadius + bottomPipeHeight / 2) {
@@ -203,7 +203,7 @@ class GameViewModel: ObservableObject {
 
     
     private func checkScoreIncrement() {
-        let slothX: CGFloat = 100 // Sloth X position
+        let slothX: CGFloat = GameConstants.screenWidth * 0.25 // Sloth X position - 25% from left
         
         for i in 0..<pipes.count {
             // Check if sloth has passed through this pipe
@@ -215,7 +215,8 @@ class GameViewModel: ObservableObject {
     }
     
     private func checkBoundaryCollisions() -> Bool {
-        if sloth.y + 15 > GameConstants.screenCenter || sloth.y - 15 < -GameConstants.screenCenter {
+        let boundaryMargin = GameConstants.screenHeight * 0.0375 // 3.75% of screen height
+        if sloth.y + boundaryMargin > GameConstants.screenCenter || sloth.y - boundaryMargin < -GameConstants.screenCenter {
             return true
         }
         return false
