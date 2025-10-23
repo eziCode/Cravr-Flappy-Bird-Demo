@@ -29,7 +29,10 @@ struct MenuView: View {
                     }
                 
                 // Sloth Logo
-                SlothIcon(size: GameConstants.screenWidth * 0.25) // 25% of screen width
+                Image("sloth-image")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: GameConstants.screenWidth * 0.25, height: GameConstants.screenWidth * 0.25) // 25% of screen width
                     .scaleEffect(viewModel.sloth.scale)
             }
             

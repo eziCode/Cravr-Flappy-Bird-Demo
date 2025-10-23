@@ -13,7 +13,10 @@ struct GameView: View {
     var body: some View {
         ZStack {
             // Sloth with enhanced styling
-            SlothIcon(size: GameConstants.screenWidth * 0.1) // 10% of screen width
+            Image("sloth-image")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: GameConstants.screenWidth * 0.15, height: GameConstants.screenWidth * 0.15) // 15% of screen width
                 .scaleEffect(viewModel.sloth.scale)
                 .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
                 .position(x: GameConstants.screenWidth * 0.25, y: viewModel.sloth.y + GameConstants.screenCenter) // 25% from left
