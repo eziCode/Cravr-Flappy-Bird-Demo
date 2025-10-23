@@ -21,6 +21,15 @@ struct GameView: View {
                 .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
                 .position(x: GameConstants.screenWidth * 0.25, y: viewModel.sloth.y + GameConstants.screenCenter) // 25% from left
             
+            // DEBUG: Polygonal Sloth Hitbox (UPDATED)
+            SlothHitbox()
+                .stroke(Color.red, lineWidth: 2)
+                .frame(width: GameConstants.screenWidth * 0.15, height: GameConstants.screenWidth * 0.15)
+                .scaleEffect(viewModel.sloth.scale)
+                .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
+                .position(x: GameConstants.screenWidth * 0.25, y: viewModel.sloth.y + GameConstants.screenCenter)
+                .opacity(0.7)
+            
             // Enhanced Pipes
             ForEach(viewModel.pipes) { pipe in
                 PipeView(pipe: pipe)
@@ -63,7 +72,7 @@ struct PipeView: View {
                 //     .fill(Color.red.opacity(0.3))
                 //     .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
                 //     .clipShape(TriangleCutRectangle(cutCorners: [.bottomLeft, .bottomRight], triangleSize: 40, triangleSize2: 20))
-                //     .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
+                //     // .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
             }
             
             // Bottom pipe - extended beyond screen
@@ -79,9 +88,57 @@ struct PipeView: View {
                 //     .fill(Color.red.opacity(0.3))
                 //     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
                 //     .clipShape(TriangleCutRectangle(cutCorners: [.topRight, .topLeft], triangleSize: 40, triangleSize2: 20))
-                //     .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
+                //     // .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
             }
         }
+    }
+}
+
+// MARK: - UPDATED SLOTH HITBOX (Final Precision Tweaks)
+struct SlothHitbox: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        // Start near the face/upper body (mid-left)
+        
+        // Start Point (Face/Neck) - Tighter to the body
+        path.move(to: CGPoint(x: rect.minX + rect.width * 0.35, y: rect.minY + rect.height * 0.32)) // Moved X right (0.3->0.35) and Y up (0.35->0.32)
+        
+        // 1. Top Outline (Back/Shoulder)
+        // Upper Head/Back Curve (highest point)
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.5, y: rect.minY + rect.height * 0.25))
+        
+        // Shoulder/Upper Arm Curve - Dropped slightly to fix overlap
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.7, y: rect.minY + rect.height * 0.33)) // Y changed from 0.3 to 0.33
+        
+        // 2. Front Arm/Hand (Far Right - CAPTURING FINGERS)
+        // Hand tip (Upper edge of claw - further out)
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.03, y: rect.minY + rect.height * 0.4)) 
+        
+        // Lowest part of the fingers/claw
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.05, y: rect.minY + rect.height * 0.6)) 
+        
+        // 3. Bottom Outline (Lower Arm/Belly/Leg)
+        // Underside of arm (Tweak from previous step)
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.3, y: rect.minY + rect.height * 0.6))
+        
+        // Belly curve (Kept tight)
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.6, y: rect.maxY - rect.height * 0.2))
+        
+        // Back Leg (Lowest point, kept high)
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.3, y: rect.maxY - rect.height * 0.15))
+        
+        // 4. Back Leg/Foot (Far Left)
+        // Back foot tip 
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.05, y: rect.minY + rect.height * 0.75))
+        
+        // Upper back leg/Connect to start
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.15, y: rect.minY + rect.height * 0.55))
+        
+        // Close the path back to start (connects to the first point)
+        path.closeSubpath()
+        
+        return path
     }
 }
 
@@ -104,6 +161,8 @@ struct TriangleCutRectangle: Shape {
         return path
     }
     
+    // Note: UIRectCorner is not a standard SwiftUI/Shape type, you might need a simple enum if this isn't in a UIKit/AppKit context.
+    // Assuming UIRectCorner is defined elsewhere or this is part of a larger, custom environment.
     private func createTrianglePath(in rect: CGRect, corner: UIRectCorner, size: CGFloat, size2: CGFloat) -> Path {
         var trianglePath = Path()
         
