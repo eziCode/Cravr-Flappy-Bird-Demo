@@ -282,7 +282,7 @@ class GameViewModel: ObservableObject {
             
             // 2. Front Arm/Hand (Far Right - CAPTURING FINGERS)
             // Hand tip (Upper edge of claw - further out)
-            CGPoint(x: rect.maxX - rect.width * 0.03, y: rect.minY + rect.height * 0.4),
+            CGPoint(x: rect.maxX - rect.width * 0.03, y: rect.minY + rect.height * 0.5),
             
             // Lowest part of the fingers/claw
             CGPoint(x: rect.maxX - rect.width * 0.05, y: rect.minY + rect.height * 0.6),
@@ -292,7 +292,7 @@ class GameViewModel: ObservableObject {
             CGPoint(x: rect.maxX - rect.width * 0.3, y: rect.minY + rect.height * 0.6),
             
             // Belly curve (Kept tight)
-            CGPoint(x: rect.minX + rect.width * 0.6, y: rect.maxY - rect.height * 0.2),
+            CGPoint(x: rect.minX + rect.width * 0.6, y: rect.maxY - rect.height * 0.4),
             
             // Back Leg (Lowest point, kept high)
             CGPoint(x: rect.minX + rect.width * 0.3, y: rect.maxY - rect.height * 0.15),
