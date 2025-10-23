@@ -113,7 +113,7 @@ struct SlothHitbox: Shape {
         
         // 2. Front Arm/Hand (Far Right - CAPTURING FINGERS)
         // Hand tip (Upper edge of claw - further out)
-        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.03, y: rect.minY + rect.height * 0.4)) 
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.03, y: rect.minY + rect.height * 0.5)) 
         
         // Lowest part of the fingers/claw
         path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.05, y: rect.minY + rect.height * 0.6)) 
@@ -123,7 +123,7 @@ struct SlothHitbox: Shape {
         path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.3, y: rect.minY + rect.height * 0.6))
         
         // Belly curve (Kept tight)
-        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.6, y: rect.maxY - rect.height * 0.2))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.6, y: rect.maxY - rect.height * 0.4))
         
         // Back Leg (Lowest point, kept high)
         path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.3, y: rect.maxY - rect.height * 0.15))
