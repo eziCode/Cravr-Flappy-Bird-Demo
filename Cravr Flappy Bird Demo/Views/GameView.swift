@@ -24,15 +24,15 @@ struct GameView: View {
                 .position(x: GameConstants.screenWidth * 0.25, y: viewModel.sloth.y + GameConstants.screenCenter) // 25% from left
             
             // DEBUG: Polygonal Sloth Hitbox (UPDATED)
-            SlothHitbox()
-                .stroke(Color.red, lineWidth: 2)
-                .frame(width: GameConstants.screenWidth * 0.15, height: GameConstants.screenWidth * 0.15)
-                .scaleEffect(viewModel.sloth.scale)
-                .rotationEffect(.degrees(viewModel.sloth.rotation))
-                .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
-                .animation(.easeOut(duration: 0.2), value: viewModel.sloth.rotation)
-                .position(x: GameConstants.screenWidth * 0.25, y: viewModel.sloth.y + GameConstants.screenCenter)
-                .opacity(0.7)
+            // SlothHitbox()
+            //     .stroke(Color.red, lineWidth: 2)
+            //     .frame(width: GameConstants.screenWidth * 0.15, height: GameConstants.screenWidth * 0.15)
+            //     .scaleEffect(viewModel.sloth.scale)
+            //     .rotationEffect(.degrees(viewModel.sloth.rotation))
+            //     .animation(.easeOut(duration: 0.1), value: viewModel.sloth.scale)
+            //     .animation(.easeOut(duration: 0.2), value: viewModel.sloth.rotation)
+            //     .position(x: GameConstants.screenWidth * 0.25, y: viewModel.sloth.y + GameConstants.screenCenter)
+            //     .opacity(0.7)
             
             // Enhanced Pipes
             ForEach(viewModel.pipes) { pipe in
