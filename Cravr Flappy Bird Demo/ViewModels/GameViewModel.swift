@@ -91,6 +91,7 @@ class GameViewModel: ObservableObject {
         
         // Update sloth physics
         sloth.applyGravity(GameConstants.gravity)
+        sloth.updateRotation()
         
         // Update pipes
         updatePipes()
@@ -268,8 +269,8 @@ class GameViewModel: ObservableObject {
             height: scaledSize
         )
         
-        // Use the exact same polygon points as SlothHitbox struct
-        return [
+        // Get the base polygon points (same as SlothHitbox struct)
+        let basePoints = [
             // Start Point (Face/Neck) - Tighter to the body
             CGPoint(x: rect.minX + rect.width * 0.35, y: rect.minY + rect.height * 0.32),
             
@@ -304,6 +305,32 @@ class GameViewModel: ObservableObject {
             // Upper back leg/Connect to start
             CGPoint(x: rect.minX + rect.width * 0.15, y: rect.minY + rect.height * 0.55)
         ]
+        
+        // Apply rotation if needed
+        if sloth.rotation != 0 {
+            return rotatePolygonPoints(basePoints, around: CGPoint(x: centerX, y: centerY), by: sloth.rotation)
+        }
+        
+        return basePoints
+    }
+    
+    private func rotatePolygonPoints(_ points: [CGPoint], around center: CGPoint, by degrees: Double) -> [CGPoint] {
+        let radians = degrees * .pi / 180.0
+        let cos = cos(radians)
+        let sin = sin(radians)
+        
+        return points.map { point in
+            // Translate to origin
+            let translatedX = point.x - center.x
+            let translatedY = point.y - center.y
+            
+            // Apply rotation
+            let rotatedX = translatedX * cos - translatedY * sin
+            let rotatedY = translatedX * sin + translatedY * cos
+            
+            // Translate back
+            return CGPoint(x: rotatedX + center.x, y: rotatedY + center.y)
+        }
     }
     
     private func getPolygonBounds(polygon: [CGPoint]) -> CGRect {
