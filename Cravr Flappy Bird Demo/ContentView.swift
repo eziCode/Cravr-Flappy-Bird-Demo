@@ -24,10 +24,6 @@ struct ContentView: View {
                 GameView(viewModel: viewModel)
             }
         }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            viewModel.handleTap()
-        }
     }
 }
 

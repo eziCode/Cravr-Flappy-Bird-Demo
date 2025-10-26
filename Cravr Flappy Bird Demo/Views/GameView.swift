@@ -56,6 +56,10 @@ struct GameView: View {
                 .position(x: GameConstants.screenWidth / 2, y: GameConstants.screenHeight * 0.08) // 8% from top
             }
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.handleTap()
+        }
     }
 }
 

@@ -9,13 +9,13 @@ import Foundation
 import SwiftUI
 
 struct Sloth {
-    var y: CGFloat = 0
+    var y: CGFloat = -UIScreen.main.bounds.height * 0.1 // start a bit higher
     var velocity: CGFloat = 0
     var scale: CGFloat = 1.0
     var rotation: Double = 0.0 // Rotation in degrees
     
     mutating func reset() {
-        y = 0
+        y = -UIScreen.main.bounds.height * 0.1
         velocity = 0
         scale = 1.0
         rotation = 0.0
@@ -25,9 +25,9 @@ struct Sloth {
         velocity = jumpForce
     }
     
-    mutating func applyGravity(_ gravity: CGFloat) {
-        velocity += gravity
-        y += velocity
+    mutating func applyGravity(_ gravity: CGFloat, deltaTime: CGFloat) {
+        velocity += gravity * deltaTime * 60 // normalize to 60 FPS baseline
+        y += velocity * deltaTime * 60
     }
     
     mutating func updateRotation() {

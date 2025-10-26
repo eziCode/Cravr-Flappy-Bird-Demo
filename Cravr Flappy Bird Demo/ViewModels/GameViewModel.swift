@@ -20,9 +20,10 @@ class GameViewModel: ObservableObject {
     @Published var highScore: Int = 0
     
     // MARK: - Private Properties
-    private var timer: Timer?
+    private var displayLink: CADisplayLink?
     private let soundManager = SoundManager.shared
     private let haptics = Haptics.shared
+    private var lastUpdateTime: TimeInterval?
     
     // MARK: - Computed Properties
     var pipeSpeed: CGFloat {
@@ -37,19 +38,35 @@ class GameViewModel: ObservableObject {
     // MARK: - Initialization
     init() {
         loadHighScore()
+        lastUpdateTime = CACurrentMediaTime()
     }
     
     // MARK: - Game Control
     func startGame() {
+        // Prevent multiple calls to startGame
+        guard gameState != .playing else {
+            print("⚠️ startGame() called but game is already playing - ignoring")
+            print("Call stack: \(Thread.callStackSymbols.prefix(5))")
+            return
+        }
+        
+        print("🚀 startGame() called")
+        print("Call stack: \(Thread.callStackSymbols.prefix(5))")
         gameState = .playing
         sloth.reset()
         score = 0
         pipes = [Pipe(x: GameConstants.screenWidth + GameConstants.screenWidth * 0.25, topHeight: CGFloat.random(in: GameConstants.easyPipeHeightRange))]
         hasPlayedOnce = true
-        startGameTimer()
+        lastUpdateTime = CACurrentMediaTime() // ✅ important
+        
+        // ✅ Small delay ensures SwiftUI body updates and avoids glitch
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            self.startGameTimer()
+        }
     }
     
     func resetGame() {
+        print("🔄 resetGame() called")
         
         // Update high score if current score is higher
         if score > highScore {
@@ -65,66 +82,106 @@ class GameViewModel: ObservableObject {
     }
     
     func handleTap() {
-        if gameState == .playing {
-            sloth.jump(with: GameConstants.jump)
-            animateSlothScale()
-            haptics.impact(.light)
+        print("👆 handleTap() called - gameState: \(gameState)")
+        guard gameState == .playing else {
+            print("⚠️ handleTap() called but game is not playing - ignoring")
+            return
         }
+        
+        print("🦥 Sloth jumping! Current y: \(sloth.y), velocity: \(sloth.velocity)")
+        sloth.jump(with: GameConstants.jump)
+        animateSlothScale()
+        haptics.impact(.light)
     }
     
     // MARK: - Game Logic
     private func startGameTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: GameConstants.gameTimerInterval, repeats: true) { _ in
-            Task { @MainActor in
-                self.updateGame()
-            }
-        }
+        stopGameTimer()
+        displayLink = CADisplayLink(target: self, selector: #selector(gameLoop))
+        displayLink?.add(to: .main, forMode: .common)
+    }
+    
+    @objc private func gameLoop() {
+        updateGame()
     }
     
     private func stopGameTimer() {
-        timer?.invalidate()
-        timer = nil
+        displayLink?.invalidate()
+        displayLink = nil
     }
     
     private func updateGame() {
         guard gameState == .playing else { return }
+
+        let currentTime = CACurrentMediaTime()
+        let deltaTime: CGFloat
+        if let lastTime = lastUpdateTime {
+            deltaTime = CGFloat(currentTime - lastTime)
+        } else {
+            deltaTime = 1 / 60 // Assume 60 FPS on first frame
+        }
+        lastUpdateTime = currentTime
         
-        // Update sloth physics
-        sloth.applyGravity(GameConstants.gravity)
+        // Cap delta time to prevent large jumps and ensure consistent physics
+        let clampedDeltaTime = min(max(deltaTime, 0.008), 0.033) // Between 30-120 FPS equivalent
+
+        // Apply gravity scaled by delta time
+        sloth.applyGravity(GameConstants.gravity, deltaTime: clampedDeltaTime)
         sloth.updateRotation()
         
-        // Update pipes
+        // Debug: Print sloth position every 30 frames (0.5 seconds at 60 FPS)
+        if Int(currentTime * 60) % 30 == 0 {
+            print("Sloth y: \(sloth.y), velocity: \(sloth.velocity), deltaTime: \(deltaTime), clamped: \(clampedDeltaTime)")
+        }
+
         updatePipes()
         
-        // Check collisions
+        // Debug: Print pipe info every 30 frames
+        if Int(currentTime * 60) % 30 == 0 {
+            print("Pipes count: \(pipes.count), pipe speed: \(pipeSpeed)")
+            if !pipes.isEmpty {
+                print("First pipe x: \(pipes[0].x)")
+            }
+        }
+        
         if checkCollisions() {
+            print("💥 Collision detected with pipe!")
             resetGame()
             return
         }
         
-        // Check ground & ceiling
         if checkBoundaryCollisions() {
+            print("🚧 Boundary collision detected! Sloth y: \(sloth.y), Screen Y: \(sloth.y + GameConstants.screenCenter)")
             resetGame()
             return
         }
         
-        // Check for score increments
         checkScoreIncrement()
     }
     
     private func updatePipes() {
-        // TODO: implement
+        guard !pipes.isEmpty else { return } // ✅ prevents accidental early call
+        
+        // Debug: Log pipe movement
+        let initialPipeCount = pipes.count
+        let initialFirstPipeX = pipes.first?.x ?? -1
+        
         for i in 0..<pipes.count {
             pipes[i].x -= pipeSpeed
         }
 
         pipes.removeAll { $0.x + GameConstants.pipeWidth < 0 }
 
-        if let lastPipe = pipes.last {
-            if lastPipe.x < GameConstants.screenWidth - GameConstants.screenWidth * 0.5 {
-                let topHeight = CGFloat.random(in: GameConstants.easyPipeHeightRange)
-                pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
-            }
+        // Generate new pipes - check if we need to add one
+        if let lastPipe = pipes.last,
+           lastPipe.x < GameConstants.screenWidth - GameConstants.screenWidth * 0.5 {
+            let topHeight = CGFloat.random(in: GameConstants.easyPipeHeightRange)
+            pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
+        }
+        
+        // Debug: Log what happened
+        if initialPipeCount != pipes.count || (pipes.first?.x ?? -1) != initialFirstPipeX {
+            print("Pipes updated: count \(initialPipeCount) -> \(pipes.count), first pipe x: \(initialFirstPipeX) -> \(pipes.first?.x ?? -1)")
         }
     }
     
@@ -430,7 +487,10 @@ class GameViewModel: ObservableObject {
     
     private func checkBoundaryCollisions() -> Bool {
         let boundaryMargin = GameConstants.screenHeight * 0.0375 // 3.75% of screen height
-        if sloth.y + boundaryMargin > GameConstants.screenCenter || sloth.y - boundaryMargin < -GameConstants.screenCenter {
+        // Check if sloth hits top or bottom of screen
+        // sloth.y is relative to screen center, so we check against screen bounds
+        let slothScreenY = sloth.y + GameConstants.screenCenter
+        if slothScreenY + boundaryMargin > GameConstants.screenHeight || slothScreenY - boundaryMargin < 0 {
             return true
         }
         return false
@@ -468,7 +528,7 @@ class GameViewModel: ObservableObject {
     
     // MARK: - Cleanup
     deinit {
-        // Timer will be automatically invalidated when the view model is deallocated
-        // No need for explicit cleanup since timer is weak-referenced
+        displayLink?.invalidate()
+        displayLink = nil
     }
 }
