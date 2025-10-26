@@ -9,14 +9,14 @@ import Foundation
 import UIKit
 
 struct GameConstants {
-    static let gravity: CGFloat = 0.6 // Real-world gravity per second
-    static let jump: CGFloat = -15 // Stronger jump force
+    static let gravity: CGFloat = 0.55 // Real-world gravity per second
+    static let jump: CGFloat = -10
     
     // Relative to screen width
     static var pipeWidth: CGFloat { screenWidth * 0.2 } // 20% of screen width
     static var pipeSpacing: CGFloat { screenWidth * 0.45 } // 45% of screen width
     static var pipeCapHeight: CGFloat { screenWidth * 0.05 } // 5% of screen width
-    static var basePipeSpeed: CGFloat { screenWidth * 0.02 } // 5% of screen width per frame
+    static var basePipeSpeed: CGFloat { screenWidth * 0.015 } // 5% of screen width per frame
     
     // Scoring thresholds
     static let speedIncreaseThreshold = 10
