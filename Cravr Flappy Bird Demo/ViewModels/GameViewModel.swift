@@ -45,13 +45,9 @@ class GameViewModel: ObservableObject {
     func startGame() {
         // Prevent multiple calls to startGame
         guard gameState != .playing else {
-            print("⚠️ startGame() called but game is already playing - ignoring")
-            print("Call stack: \(Thread.callStackSymbols.prefix(5))")
             return
         }
         
-        print("🚀 startGame() called")
-        print("Call stack: \(Thread.callStackSymbols.prefix(5))")
         gameState = .playing
         sloth.reset()
         score = 0
@@ -66,8 +62,6 @@ class GameViewModel: ObservableObject {
     }
     
     func resetGame() {
-        print("🔄 resetGame() called")
-        
         // Update high score if current score is higher
         if score > highScore {
             highScore = score
@@ -82,13 +76,10 @@ class GameViewModel: ObservableObject {
     }
     
     func handleTap() {
-        print("👆 handleTap() called - gameState: \(gameState)")
         guard gameState == .playing else {
-            print("⚠️ handleTap() called but game is not playing - ignoring")
             return
         }
         
-        print("🦥 Sloth jumping! Current y: \(sloth.y), velocity: \(sloth.velocity)")
         sloth.jump(with: GameConstants.jump)
         animateSlothScale()
         haptics.impact(.light)
@@ -128,30 +119,15 @@ class GameViewModel: ObservableObject {
         // Apply gravity scaled by delta time
         sloth.applyGravity(GameConstants.gravity, deltaTime: clampedDeltaTime)
         sloth.updateRotation()
-        
-        // Debug: Print sloth position every 30 frames (0.5 seconds at 60 FPS)
-        if Int(currentTime * 60) % 30 == 0 {
-            print("Sloth y: \(sloth.y), velocity: \(sloth.velocity), deltaTime: \(deltaTime), clamped: \(clampedDeltaTime)")
-        }
 
         updatePipes()
         
-        // Debug: Print pipe info every 30 frames
-        if Int(currentTime * 60) % 30 == 0 {
-            print("Pipes count: \(pipes.count), pipe speed: \(pipeSpeed)")
-            if !pipes.isEmpty {
-                print("First pipe x: \(pipes[0].x)")
-            }
-        }
-        
         if checkCollisions() {
-            print("💥 Collision detected with pipe!")
             resetGame()
             return
         }
         
         if checkBoundaryCollisions() {
-            print("🚧 Boundary collision detected! Sloth y: \(sloth.y), Screen Y: \(sloth.y + GameConstants.screenCenter)")
             resetGame()
             return
         }
@@ -161,10 +137,6 @@ class GameViewModel: ObservableObject {
     
     private func updatePipes() {
         guard !pipes.isEmpty else { return } // ✅ prevents accidental early call
-        
-        // Debug: Log pipe movement
-        let initialPipeCount = pipes.count
-        let initialFirstPipeX = pipes.first?.x ?? -1
         
         for i in 0..<pipes.count {
             pipes[i].x -= pipeSpeed
@@ -177,11 +149,6 @@ class GameViewModel: ObservableObject {
            lastPipe.x < GameConstants.screenWidth - GameConstants.screenWidth * 0.5 {
             let topHeight = CGFloat.random(in: GameConstants.easyPipeHeightRange)
             pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
-        }
-        
-        // Debug: Log what happened
-        if initialPipeCount != pipes.count || (pipes.first?.x ?? -1) != initialFirstPipeX {
-            print("Pipes updated: count \(initialPipeCount) -> \(pipes.count), first pipe x: \(initialFirstPipeX) -> \(pipes.first?.x ?? -1)")
         }
     }
     
