@@ -76,6 +76,11 @@ class GameViewModel: ObservableObject {
     }
     
     func handleTap() {
+        if gameState == .menu {
+            startGame()
+            return
+        }
+        
         guard gameState == .playing else {
             return
         }
