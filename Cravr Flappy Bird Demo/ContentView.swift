@@ -14,11 +14,7 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Solid color background for both menu and game
-            Color(hex: "88ced4")
-                .ignoresSafeArea()
-            
-            // Scrolling background image (always visible)
+            // Scrolling background with stars and gradient (always visible)
             ScrollingBackgroundImage()
                 .ignoresSafeArea()
                 .id("scrolling_background") // Stable identity across transitions
