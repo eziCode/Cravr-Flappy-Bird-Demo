@@ -47,20 +47,24 @@ struct MenuView: View {
                 VStack(spacing: 10) {
                     Text("HIGH SCORE")
                         .font(.system(size: GameConstants.screenWidth * 0.045, weight: .semibold, design: .rounded)) // 4.5% of screen width
-                        .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
-                        .shadow(color: .black, radius: 2, x: 1, y: 1)
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.8), radius: 3, x: 2, y: 2)
                     
                     ZStack {
-                        // Score background
+                        // Score background with enhanced styling
                         RoundedRectangle(cornerRadius: GameConstants.screenWidth * 0.03) // 3% of screen width
                             .frame(width: GameConstants.screenWidth * 0.3, height: GameConstants.screenHeight * 0.065) // 30% width, 6.5% height
-                            .foregroundColor(.black.opacity(0.6))
-                            .blur(radius: 1)
+                            .foregroundColor(.black.opacity(0.7))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: GameConstants.screenWidth * 0.03)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 2)
+                            )
+                            .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
                         
                         Text("\(viewModel.highScore)")
                             .font(.system(size: GameConstants.screenWidth * 0.07, weight: .bold, design: .rounded)) // 7% of screen width
-                            .foregroundColor(Color(hex: "f7ec59")) // Maize
-                            .shadow(color: .black, radius: 2, x: 1, y: 1)
+                            .foregroundColor(Color(hex: "FFD700")) // Gold
+                            .shadow(color: .black.opacity(0.8), radius: 3, x: 2, y: 2)
                     }
                 }
                 
@@ -70,13 +74,13 @@ struct MenuView: View {
                 VStack(spacing: 15) {
                     Text("TAP ANYWHERE")
                         .font(.system(size: GameConstants.screenWidth * 0.055, weight: .bold, design: .rounded)) // 5.5% of screen width
-                        .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
-                        .shadow(color: .black, radius: 2, x: 1, y: 1)
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.8), radius: 3, x: 2, y: 2)
                     
                     Text("TO START")
                         .font(.system(size: GameConstants.screenWidth * 0.055, weight: .bold, design: .rounded)) // 5.5% of screen width
-                        .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
-                        .shadow(color: .black, radius: 2, x: 1, y: 1)
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.8), radius: 3, x: 2, y: 2)
                         .opacity(0.9)
                 }
                 .scaleEffect(logoPulseScale) // Pulsing scale animation
@@ -97,8 +101,8 @@ struct MenuView: View {
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: GameConstants.screenWidth * 0.06, weight: .bold))
-                            .foregroundColor(Color(hex: "92dce5")) // Non Photo Blue
-                            .shadow(color: .black, radius: 2, x: 1, y: 1)
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.8), radius: 3, x: 2, y: 2)
                             .padding(GameConstants.screenWidth * 0.04)
                     }
                     Spacer()
