@@ -11,9 +11,7 @@ import SwiftUI
 struct Pipe: Identifiable {
     let id = UUID()
     var x: CGFloat
-    var topHeight: CGFloat
-    var bottomHeight: CGFloat {
-        UIScreen.main.bounds.height - topHeight - GameConstants.pipeSpacing
-    }
+    var gapHeight: CGFloat // Height of the gap between pipes
+    var verticalOffset: CGFloat // Vertical offset to position the gap
     var passed = false
 }

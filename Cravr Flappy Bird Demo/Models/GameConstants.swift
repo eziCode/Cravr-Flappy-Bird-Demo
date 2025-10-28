@@ -32,6 +32,21 @@ struct GameConstants {
     static var pipeGenerationDistance: CGFloat { screenWidth * 0.5 } // 50% of screen width
     static var pipeRemovalThreshold: CGFloat { -screenWidth * 0.125 } // -12.5% of screen width
     
+    // Pipe gap height - gets smaller as score increases
+    static func gapHeight(for score: Int) -> CGFloat {
+        let baseGap = screenHeight * 0.28 // 28% of screen height (easy)
+        let minGap = screenHeight * 0.18 // 18% of screen height (hard)
+        
+        // Gradually decrease gap every 10 points
+        let difficultyLevel = min(score / difficultyIncreaseThreshold, maxDifficultyLevel)
+        let gapReduction = (baseGap - minGap) / CGFloat(maxDifficultyLevel)
+        
+        return baseGap - (gapReduction * CGFloat(difficultyLevel))
+    }
+    
+    // Pipe height for VStack (long enough to extend beyond screen)
+    static var pipeExtendedHeight: CGFloat { screenHeight * 1.2 } // 120% of screen height
+    
     // Screen bounds
     static var screenHeight: CGFloat { UIScreen.main.bounds.height }
     static var screenWidth: CGFloat { UIScreen.main.bounds.width }

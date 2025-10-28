@@ -51,7 +51,12 @@ class GameViewModel: ObservableObject {
         gameState = .playing
         sloth.reset()
         score = 0
-        pipes = [Pipe(x: GameConstants.screenWidth + GameConstants.screenWidth * 0.25, topHeight: CGFloat.random(in: GameConstants.easyPipeHeightRange))]
+        
+        // Generate first pipe with new structure
+        let gapHeight = GameConstants.gapHeight(for: score)
+        let verticalOffset = CGFloat.random(in: -GameConstants.screenHeight * 0.2...GameConstants.screenHeight * 0.2)
+        pipes = [Pipe(x: GameConstants.screenWidth + GameConstants.screenWidth * 0.25, gapHeight: gapHeight, verticalOffset: verticalOffset)]
+        
         hasPlayedOnce = true
         lastUpdateTime = CACurrentMediaTime() // ✅ important
         
@@ -152,8 +157,9 @@ class GameViewModel: ObservableObject {
         // Generate new pipes - check if we need to add one
         if let lastPipe = pipes.last,
            lastPipe.x < GameConstants.screenWidth - GameConstants.screenWidth * 0.5 {
-            let topHeight = CGFloat.random(in: GameConstants.easyPipeHeightRange)
-            pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, topHeight: topHeight))
+            let gapHeight = GameConstants.gapHeight(for: score)
+            let verticalOffset = CGFloat.random(in: -GameConstants.screenHeight * 0.2...GameConstants.screenHeight * 0.2)
+            pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, gapHeight: gapHeight, verticalOffset: verticalOffset))
         }
     }
     
@@ -162,19 +168,26 @@ class GameViewModel: ObservableObject {
         let slothY: CGFloat = sloth.y + GameConstants.screenCenter
         let slothSize: CGFloat = GameConstants.screenWidth * 0.15 // 15% of screen width (matches visual)
         let slothScale = sloth.scale
-        
-        // These match the TriangleCutRectangle sizes
-        let triangleSize: CGFloat = GameConstants.screenWidth * 0.1   // 10% of screen width for right corners
-        let triangleSize2: CGFloat = GameConstants.screenWidth * 0.05  // 5% of screen width for left corners
 
         for pipe in pipes {
-            // === TOP PIPE ===
-            let topPipeX = pipe.x - GameConstants.screenWidth * 0.04875
-            let topPipeY = pipe.topHeight / 2 - GameConstants.screenHeight * 0.1875
+            // Calculate pipe positions based on VStack structure
+            let totalVStackHeight = 2 * GameConstants.pipeExtendedHeight + pipe.gapHeight
+            let vStackCenterY = GameConstants.screenHeight / 2 + pipe.verticalOffset
+            let vStackTop = vStackCenterY - totalVStackHeight / 2
+            
+            // Top pipe bounds
+            let topPipeX = pipe.x
+            let topPipeY = vStackTop + GameConstants.pipeExtendedHeight / 2
             let topPipeWidth = GameConstants.pipeWidth
-            let topPipeHeight = pipe.topHeight + GameConstants.screenHeight * 0.375
+            let topPipeHeight = GameConstants.pipeExtendedHeight
+            
+            // Bottom pipe bounds
+            let bottomPipeX = pipe.x
+            let bottomPipeY = vStackTop + GameConstants.pipeExtendedHeight + pipe.gapHeight + GameConstants.pipeExtendedHeight / 2
+            let bottomPipeWidth = GameConstants.pipeWidth
+            let bottomPipeHeight = GameConstants.pipeExtendedHeight
 
-            // Check if sloth polygonal hitbox intersects with top pipe
+            // Check collision with top pipe
             if checkSlothPolygonCollisionWithPipe(
                 slothX: slothX, 
                 slothY: slothY, 
@@ -183,21 +196,12 @@ class GameViewModel: ObservableObject {
                 pipeX: topPipeX, 
                 pipeY: topPipeY, 
                 pipeWidth: topPipeWidth, 
-                pipeHeight: topPipeHeight,
-                triangleSize: triangleSize,
-                triangleSize2: triangleSize2,
-                isTopPipe: true
+                pipeHeight: topPipeHeight
             ) {
                 return true
             }
 
-            // === BOTTOM PIPE ===
-            let bottomPipeX = pipe.x - GameConstants.screenWidth * 0.04875
-            let bottomPipeY = GameConstants.screenHeight - (pipe.bottomHeight / 2) + GameConstants.screenHeight * 0.1875
-            let bottomPipeWidth = GameConstants.pipeWidth
-            let bottomPipeHeight = pipe.bottomHeight + GameConstants.screenHeight * 0.375
-
-            // Check if sloth polygonal hitbox intersects with bottom pipe
+            // Check collision with bottom pipe
             if checkSlothPolygonCollisionWithPipe(
                 slothX: slothX, 
                 slothY: slothY, 
@@ -206,10 +210,7 @@ class GameViewModel: ObservableObject {
                 pipeX: bottomPipeX, 
                 pipeY: bottomPipeY, 
                 pipeWidth: bottomPipeWidth, 
-                pipeHeight: bottomPipeHeight,
-                triangleSize: triangleSize,
-                triangleSize2: triangleSize2,
-                isTopPipe: false
+                pipeHeight: bottomPipeHeight
             ) {
                 return true
             }
@@ -227,10 +228,7 @@ class GameViewModel: ObservableObject {
         pipeX: CGFloat, 
         pipeY: CGFloat, 
         pipeWidth: CGFloat, 
-        pipeHeight: CGFloat,
-        triangleSize: CGFloat,
-        triangleSize2: CGFloat,
-        isTopPipe: Bool
+        pipeHeight: CGFloat
     ) -> Bool {
         // Get the sloth polygon points (exact same as SlothHitbox struct)
         let slothPolygon = getSlothPolygonPoints(
@@ -253,17 +251,14 @@ class GameViewModel: ObservableObject {
             return false
         }
         
-        // Check if any sloth polygon vertices are inside the pipe (with cutouts)
+        // Check if any sloth polygon vertices are inside the pipe (simple rectangle)
         for point in slothPolygon {
-            if isPointInPipeWithCutouts(
+            if isPointInRectangle(
                 point: point,
-                pipeX: pipeX,
-                pipeY: pipeY,
-                pipeWidth: pipeWidth,
-                pipeHeight: pipeHeight,
-                triangleSize: triangleSize,
-                triangleSize2: triangleSize2,
-                isTopPipe: isTopPipe
+                rectX: pipeX,
+                rectY: pipeY,
+                rectWidth: pipeWidth,
+                rectHeight: pipeHeight
             ) {
                 return true
             }
@@ -393,54 +388,19 @@ class GameViewModel: ObservableObject {
         return inside
     }
     
-    private func isPointInPipeWithCutouts(
+    private func isPointInRectangle(
         point: CGPoint,
-        pipeX: CGFloat,
-        pipeY: CGFloat,
-        pipeWidth: CGFloat,
-        pipeHeight: CGFloat,
-        triangleSize: CGFloat,
-        triangleSize2: CGFloat,
-        isTopPipe: Bool
+        rectX: CGFloat,
+        rectY: CGFloat,
+        rectWidth: CGFloat,
+        rectHeight: CGFloat
     ) -> Bool {
-        // Convert point to local coordinates of the pipe
-        let localX = point.x - (pipeX - pipeWidth / 2)
-        let localY = point.y - (pipeY - pipeHeight / 2)
+        let left = rectX - rectWidth / 2
+        let right = rectX + rectWidth / 2
+        let top = rectY - rectHeight / 2
+        let bottom = rectY + rectHeight / 2
         
-        // Check if point is within pipe bounds
-        if localX < 0 || localX > pipeWidth || localY < 0 || localY > pipeHeight {
-            return false
-        }
-        
-        if isTopPipe {
-            // Define cutout triangles (bottomLeft & bottomRight)
-            let inBottomRightCutout =
-                (localX > pipeWidth - triangleSize) &&
-                (localY > pipeHeight - triangleSize) &&
-                ((localX - (pipeWidth - triangleSize)) + (localY - (pipeHeight - triangleSize)) > triangleSize)
-
-            let inBottomLeftCutout =
-                (localX < triangleSize2) &&
-                (localY > pipeHeight - triangleSize2) &&
-                (((triangleSize2 - localX) + (localY - (pipeHeight - triangleSize2))) > triangleSize2)
-
-            // Return true if point is in pipe but not in cutouts
-            return !(inBottomRightCutout || inBottomLeftCutout)
-        } else {
-            // Define topRight & topLeft cutouts
-            let inTopRightCutout =
-                (localX > pipeWidth - triangleSize) &&
-                (localY < triangleSize) &&
-                ((localX - (pipeWidth - triangleSize)) + (triangleSize - localY) > triangleSize)
-
-            let inTopLeftCutout =
-                (localX < triangleSize2) &&
-                (localY < triangleSize2) &&
-                (((triangleSize2 - localX) + (triangleSize2 - localY)) > triangleSize2)
-
-            // Return true if point is in pipe but not in cutouts
-            return !(inTopRightCutout || inTopLeftCutout)
-        }
+        return point.x >= left && point.x <= right && point.y >= top && point.y <= bottom
     }
 
 

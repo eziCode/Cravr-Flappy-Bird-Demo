@@ -67,38 +67,24 @@ struct PipeView: View {
     let pipe: Pipe
     
     var body: some View {
-        ZStack {
-            // Top pipe - extended beyond screen
-            ZStack {
-                Image("tree-trunk-pipe-image")
-                    .resizable()
-                    .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + GameConstants.screenHeight * 0.375) // Consistent width, variable height
-                    .scaleEffect(x: 1, y: -1) // Only reflection, no width scaling
-                    .position(x: pipe.x - GameConstants.screenWidth * 0.04875, y: pipe.topHeight / 2 - GameConstants.screenHeight * 0.1875) // Match collision detection positioning
-                
-                // Rectangle()
-                //     .fill(Color.red.opacity(0.3))
-                //     .frame(width: GameConstants.pipeWidth, height: pipe.topHeight + 300) // Consistent width, variable height
-                //     .clipShape(TriangleCutRectangle(cutCorners: [.bottomLeft, .bottomRight], triangleSize: 40, triangleSize2: 20))
-                //     // .position(x: pipe.x - 19.5, y: pipe.topHeight / 2 - 150) // Match collision detection positioning
-            }
+        VStack(spacing: 0) {
+            // Top pipe - extended beyond screen, flipped vertically
+            Image("tree-trunk-pipe-image")
+                .resizable()
+                .frame(width: GameConstants.pipeWidth, height: GameConstants.pipeExtendedHeight)
+                .scaleEffect(x: 1, y: -1) // Flip vertically
+            
+            // Gap spacer with dynamic height
+            Spacer()
+                .frame(height: pipe.gapHeight)
             
             // Bottom pipe - extended beyond screen
-            ZStack {
-                Image("tree-trunk-pipe-image")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + GameConstants.screenHeight * 0.375) // Consistent width, variable height
-                    .scaleEffect(x: 0.6, y: 1) // No scaling
-                    .position(x: pipe.x - GameConstants.screenWidth * 0.04875, y: GameConstants.screenHeight - (pipe.bottomHeight / 2) + GameConstants.screenHeight * 0.1875) // Match collision detection positioning
-                
-                // Rectangle()
-                //     .fill(Color.red.opacity(0.3))
-                //     .frame(width: GameConstants.pipeWidth, height: pipe.bottomHeight + 300) // Consistent width, variable height
-                //     .clipShape(TriangleCutRectangle(cutCorners: [.topRight, .topLeft], triangleSize: 40, triangleSize2: 20))
-                //     // .position(x: pipe.x - 19.5, y: UIScreen.main.bounds.height - (pipe.bottomHeight / 2) + 150) // Match collision detection positioning
-            }
+            Image("tree-trunk-pipe-image")
+                .resizable()
+                .frame(width: GameConstants.pipeWidth, height: GameConstants.pipeExtendedHeight)
         }
+        .position(x: pipe.x, y: GameConstants.screenHeight / 2)
+        .offset(y: pipe.verticalOffset)
     }
 }
 
