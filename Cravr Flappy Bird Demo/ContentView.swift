@@ -14,10 +14,15 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Star background
-            StarBackground()
+            // Solid color background for both menu and game
+            Color(hex: "88ced4")
                 .ignoresSafeArea()
             
+            // Scrolling background image (always visible)
+            ScrollingBackgroundImage()
+                .ignoresSafeArea()
+            
+            // Content
             if viewModel.gameState == .menu {
                 MenuView(viewModel: viewModel)
             } else {
