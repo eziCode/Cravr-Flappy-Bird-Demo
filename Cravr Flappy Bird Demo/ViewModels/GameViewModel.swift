@@ -59,7 +59,7 @@ class GameViewModel: ObservableObject {
         pipes = [Pipe(x: GameConstants.screenWidth + GameConstants.screenWidth * 0.25, gapHeight: gapHeight, verticalOffset: verticalOffset)]
         
         hasPlayedOnce = true
-        lastUpdateTime = CACurrentMediaTime() // ✅ important
+        lastUpdateTime = nil // ✅ Reset to nil so first frame uses 1/60 fallback
         
         // ✅ Small delay ensures SwiftUI body updates and avoids glitch
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
