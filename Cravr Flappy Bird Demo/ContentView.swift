@@ -21,14 +21,18 @@ struct ContentView: View {
             // Scrolling background image (always visible)
             ScrollingBackgroundImage()
                 .ignoresSafeArea()
+                .id("scrolling_background") // Stable identity across transitions
             
             // Content
             if viewModel.gameState == .menu {
                 MenuView(viewModel: viewModel)
+                    .transition(.opacity)
             } else {
                 GameView(viewModel: viewModel)
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: viewModel.gameState)
     }
 }
 
