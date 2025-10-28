@@ -10,6 +10,7 @@ import SwiftUI
 struct MenuView: View {
     @ObservedObject var viewModel: GameViewModel
     @State private var logoPulseScale: CGFloat = 0.95
+    @State private var slothHopOffset: CGFloat = 0
     
     var body: some View {
         VStack(spacing: 30) {
@@ -34,6 +35,11 @@ struct MenuView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: GameConstants.screenWidth * 0.25, height: GameConstants.screenWidth * 0.25) // 25% of screen width
                     .scaleEffect(viewModel.sloth.scale)
+                    .offset(y: slothHopOffset)
+                    .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: slothHopOffset)
+                    .onAppear {
+                        slothHopOffset = -15 // Hop up by 15 points
+                    }
             }
             
             // High Score Display
