@@ -44,6 +44,18 @@ struct GameConstants {
         return baseGap - (gapReduction * CGFloat(difficultyLevel))
     }
     
+    // Vertical offset range - increases as score increases (pipes spawn further from center)
+    static func verticalOffsetRange(for score: Int) -> CGFloat {
+        let baseRange = screenHeight * 0.1 // 10% of screen height (easy - close to middle)
+        let maxRange = screenHeight * 0.3 // 30% of screen height (hard - far from middle)
+        
+        // Gradually increase range every 10 points
+        let difficultyLevel = min(score / difficultyIncreaseThreshold, maxDifficultyLevel)
+        let rangeIncrease = (maxRange - baseRange) / CGFloat(maxDifficultyLevel)
+        
+        return baseRange + (rangeIncrease * CGFloat(difficultyLevel))
+    }
+    
     // Pipe height for VStack (long enough to extend beyond screen)
     static var pipeExtendedHeight: CGFloat { screenHeight * 1.2 } // 120% of screen height
     

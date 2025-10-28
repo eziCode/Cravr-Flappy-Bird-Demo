@@ -54,7 +54,8 @@ class GameViewModel: ObservableObject {
         
         // Generate first pipe with new structure
         let gapHeight = GameConstants.gapHeight(for: score)
-        let verticalOffset = CGFloat.random(in: -GameConstants.screenHeight * 0.2...GameConstants.screenHeight * 0.2)
+        let offsetRange = GameConstants.verticalOffsetRange(for: score)
+        let verticalOffset = CGFloat.random(in: -offsetRange...offsetRange)
         pipes = [Pipe(x: GameConstants.screenWidth + GameConstants.screenWidth * 0.25, gapHeight: gapHeight, verticalOffset: verticalOffset)]
         
         hasPlayedOnce = true
@@ -158,7 +159,8 @@ class GameViewModel: ObservableObject {
         if let lastPipe = pipes.last,
            lastPipe.x < GameConstants.screenWidth - GameConstants.screenWidth * 0.5 {
             let gapHeight = GameConstants.gapHeight(for: score)
-            let verticalOffset = CGFloat.random(in: -GameConstants.screenHeight * 0.2...GameConstants.screenHeight * 0.2)
+            let offsetRange = GameConstants.verticalOffsetRange(for: score)
+            let verticalOffset = CGFloat.random(in: -offsetRange...offsetRange)
             pipes.append(Pipe(x: GameConstants.screenWidth + GameConstants.pipeWidth, gapHeight: gapHeight, verticalOffset: verticalOffset))
         }
     }
