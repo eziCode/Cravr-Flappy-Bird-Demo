@@ -25,13 +25,11 @@ struct ScrollingBackgroundImage: View {
                 HStack(spacing: 0) {
                     Image("flappy_sloth_background")
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: screenWidth)
+                        .frame(width: screenWidth * 1.15, height: screenHeight * 0.5)
                     
                     Image("flappy_sloth_background")
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: screenWidth)
+                        .frame(width: screenWidth * 1.15, height: screenHeight * 0.5)
                 }
                 .offset(x: scrollState.offset)
                 .onChange(of: timeline.date) { _ in
@@ -40,7 +38,7 @@ struct ScrollingBackgroundImage: View {
                     scrollState.offset -= scrollSpeed
                     
                     // Reset offset when the first image is completely off-screen
-                    if scrollState.offset <= -screenWidth {
+                    if scrollState.offset <= -(screenWidth * 1.15) {
                         scrollState.offset = 0
                     }
                 }
