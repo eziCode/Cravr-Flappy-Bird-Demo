@@ -37,13 +37,12 @@ struct ScrollingBackgroundImage: View {
             let screenHeight = geometry.size.height
             
             ZStack {
-                // Evening/night sky gradient background
+                // Dark mode green gradient background
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        Color(hex: "1a1a3e"), // Deep twilight blue (top)
-                        Color(hex: "2d5a7d"), // Darker evening blue
-                        Color(hex: "5891b5"), // Lighter blue
-                        Color(hex: "88ced4")  // Original blue (where ground starts)
+                        Color(hex: "0d4f0d"), // Dark green
+                        Color(hex: "1cd91f"), // SGBus Green
+                        Color(hex: "0a3a0a")  // Darker green
                     ]),
                     startPoint: .top,
                     endPoint: .bottom

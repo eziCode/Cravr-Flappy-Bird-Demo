@@ -72,7 +72,6 @@ struct PipeView: View {
             Image("tree-trunk-pipe-image")
                 .resizable()
                 .frame(width: GameConstants.pipeWidth, height: GameConstants.pipeExtendedHeight)
-                .scaleEffect(x: 1, y: -1) // Flip vertically
             
             // Gap spacer with dynamic height
             Spacer()
