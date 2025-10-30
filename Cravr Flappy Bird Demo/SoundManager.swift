@@ -76,6 +76,12 @@ class SoundManager {
         playMultiTone(frequencies: [800, 1000, 1200], duration: 0.2, volume: 0.2)
     }
     
+    // Brief, pleasant ring for milestone scores
+    func playRing() {
+        // Two quick partials for a bell-like ring, very short
+        playMultiTone(frequencies: [1200, 1800], duration: 0.12, volume: 0.22)
+    }
+    
     // MARK: - Sound Generation
     
     private func playTone(frequency: Double, duration: Double, volume: Float, pitchBend: Double = 0) {

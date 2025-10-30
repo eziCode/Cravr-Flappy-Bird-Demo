@@ -87,6 +87,17 @@ final class Haptics {
         }
     }
 
+    /// A distinct, pleasant haptic for starting the game.
+    /// Uses success notification with a subtle follow-up tap to differentiate from jump.
+    func gameStartHaptic() {
+        // Use notification success for a crisp start feel
+        notification.notificationOccurred(.success)
+        // Add a gentle follow-up light impact shortly after
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+            self.impact(.light)
+        }
+    }
+
     func microHaptic() {
         selection.selectionChanged()
     }

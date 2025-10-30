@@ -61,6 +61,9 @@ class GameViewModel: ObservableObject {
         hasPlayedOnce = true
         lastUpdateTime = nil // ✅ Reset to nil so first frame uses 1/60 fallback
         
+        // Pleasant distinct haptic on game start
+        haptics.gameStartHaptic()
+
         // ✅ Small delay ensures SwiftUI body updates and avoids glitch
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             self.startGameTimer()
@@ -411,10 +414,16 @@ class GameViewModel: ObservableObject {
         let slothX: CGFloat = GameConstants.screenWidth * 0.25 // Sloth X position - 25% from left
         
         for i in 0..<pipes.count {
-            // Check if sloth has passed through this pipe
-            if !pipes[i].passed && pipes[i].x + GameConstants.pipeWidth < slothX {
+            // Trigger when sloth center passes the pipe's right edge
+            if !pipes[i].passed && slothX > (pipes[i].x + GameConstants.pipeWidth / 2) {
                 pipes[i].passed = true
                 score += 1
+                // Play brief ring on multiples of 10, otherwise satisfying pop
+                if score % 10 == 0 {
+                    soundManager.playRing()
+                } else {
+                    soundManager.playPop()
+                }
             }
         }
     }
