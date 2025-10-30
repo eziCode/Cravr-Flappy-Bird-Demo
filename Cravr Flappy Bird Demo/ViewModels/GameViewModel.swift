@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import UIKit
+import AVFoundation
 
 @MainActor
 class GameViewModel: ObservableObject {
@@ -21,7 +22,7 @@ class GameViewModel: ObservableObject {
     
     // MARK: - Private Properties
     private var displayLink: CADisplayLink?
-    private let soundManager = SoundManager.shared
+    private let audio = AudioService.shared
     private let haptics = Haptics.shared
     private var lastUpdateTime: TimeInterval?
     
@@ -97,6 +98,7 @@ class GameViewModel: ObservableObject {
         sloth.jump(with: GameConstants.jump)
         animateSlothScale()
         haptics.impact(.light)
+        audio.playWing()
     }
     
     // MARK: - Game Logic
@@ -418,12 +420,7 @@ class GameViewModel: ObservableObject {
             if !pipes[i].passed && slothX > (pipes[i].x + GameConstants.pipeWidth / 2) {
                 pipes[i].passed = true
                 score += 1
-                // Play brief ring on multiples of 10, otherwise satisfying pop
-                if score % 10 == 0 {
-                    soundManager.playRing()
-                } else {
-                    soundManager.playPop()
-                }
+                audio.playPoint()
             }
         }
     }
@@ -448,15 +445,6 @@ class GameViewModel: ObservableObject {
             withAnimation(.easeOut(duration: 0.1)) {
                 self.sloth.scale = 1.0
             }
-        }
-    }
-    
-    // MARK: - Audio
-    private func playScoringSound() {
-        if score % 10 == 0 && score > 0 {
-            soundManager.playChime()
-        } else {
-            soundManager.playDing()
         }
     }
     
