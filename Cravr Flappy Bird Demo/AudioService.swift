@@ -13,6 +13,7 @@ final class AudioService {
     
     private var wingPlayer: AVAudioPlayer?
     private var pointPlayer: AVAudioPlayer?
+    private var diePlayer: AVAudioPlayer?
     
     private init() {
         // Optional: Keep system sounds/music unaffected
@@ -21,9 +22,11 @@ final class AudioService {
         
         wingPlayer = loadPlayer(resource: "sfx_wing", type: "mp3")
         pointPlayer = loadPlayer(resource: "sfx_point", type: "mp3")
+        diePlayer = loadPlayer(resource: "sfx_die", type: "mp3")
         
         wingPlayer?.prepareToPlay()
         pointPlayer?.prepareToPlay()
+        diePlayer?.prepareToPlay()
     }
     
     private func loadPlayer(resource: String, type: String) -> AVAudioPlayer? {
@@ -54,6 +57,16 @@ final class AudioService {
     func playPoint() {
         guard let player = pointPlayer else { return }
         // For short SFX, a restart is fine even if overlapping events occur
+        if player.isPlaying {
+            player.stop()
+        }
+        player.currentTime = 0
+        player.play()
+    }
+
+    // Plays the die sound when the sloth dies
+    func playDie() {
+        guard let player = diePlayer else { return }
         if player.isPlaying {
             player.stop()
         }

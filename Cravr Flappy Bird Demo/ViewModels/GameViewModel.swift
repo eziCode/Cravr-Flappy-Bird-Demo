@@ -139,11 +139,13 @@ class GameViewModel: ObservableObject {
         updatePipes()
         
         if checkCollisions() {
+            audio.playDie()
             resetGame()
             return
         }
         
         if checkBoundaryCollisions() {
+            audio.playDie()
             resetGame()
             return
         }
